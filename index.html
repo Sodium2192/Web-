@@ -1,85 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Galaxy AI Chat</title>
-  <!-- Load Tailwind CSS via CDN -->
+  <!-- 修正：使用官方最新且穩定的 Tailwind CSS CDN 載入網址 -->
   <script src="jsdelivr.net"></script>
   <style>
-    /* Galaxy Starfield Background Styling */
+    /* 星空背景底色與動態閃爍星星 */
     .galaxy-bg {
-      background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-      overflow: hidden;
+      background: radial-gradient(ellipse at bottom, #0f172a 0%, #020617 100%);
+      position: relative;
     }
-    
-    /* CSS-generated stars */
-    .stars {
+    .galaxy-bg::before {
+      content: "";
       position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: transparent url('data:image/svg+xml;utf8,<svg xmlns="w3.org" width="200" height="200" viewBox="0 0 200 200"><circle cx="20" cy="30" r="1" fill="white" opacity="0.8"/><circle cx="130" cy="40" r="1.5" fill="white" opacity="0.4"/><circle cx="75" cy="110" r="1" fill="white" opacity="0.9"/><circle cx="180" cy="170" r="1" fill="white" opacity="0.5"/><circle cx="45" cy="160" r="1.5" fill="white" opacity="0.7"/></svg>') repeat;
+      inset: 0;
+      background-image: 
+        radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 100px 150px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 200px 80px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 50px 280px, #rgba(255,255,255,0.8), rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 280px 200px, #fff, rgba(0,0,0,0));
+      background-size: 300px 300px;
+      opacity: 0.6;
       z-index: 1;
     }
-
-    /* Custom fade-in for the chat appearance */
+    /* 淡入動畫 */
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.98); }
       to { opacity: 1; transform: scale(1); }
     }
     .animate-fade-in {
-      animation: fadeIn 0.4s ease-out forwards;
+      animation: fadeIn 0.3s ease-out forwards;
     }
   </style>
 </head>
-<body class="galaxy-bg relative min-h-screen w-full flex items-center justify-center font-sans text-white m-0">
+<body class="galaxy-bg min-h-screen w-full flex items-center justify-center font-sans text-white m-0 overflow-hidden">
 
-  <!-- Deep Space Nebula Overlays -->
-  <div class="stars"></div>
-  <div class="absolute inset-0 z-2 bg-[radial-gradient(circle_at_30%_40%,rgba(147,51,234,0.15),transparent_50%)]"></div>
-  <div class="absolute inset-0 z-2 bg-[radial-gradient(circle_at_70%_70%,rgba(59,130,246,0.12),transparent_60%)]"></div>
+  <!-- 星雲紫色與藍色光暈特效 -->
+  <div class="absolute inset-0 z-2 bg-[radial-gradient(circle_at_30%_35%,rgba(147,51,234,0.2),transparent_50%)]"></div>
+  <div class="absolute inset-0 z-2 bg-[radial-gradient(circle_at_70%_65%,rgba(59,130,246,0.15),transparent_50%)]"></div>
 
-  <!-- Interactive Area Container -->
-  <div class="relative z-10 w-full max-w-lg px-4 flex flex-col items-center justify-center">
+  <!-- 主體互動區容器 -->
+  <div class="relative z-10 w-full max-w-md px-4 flex flex-col items-center justify-center">
     
-    <!-- RECTANGLE START SCREEN -->
+    <!-- 1. 長方形開始按鈕畫面 -->
     <div id="start-screen" class="flex flex-col items-center justify-center w-full">
-      <button id="start-btn" class="w-64 py-4 bg-emerald-500 hover:bg-emerald-400 active:scale-98 text-slate-950 text-xl font-bold rounded-none shadow-[0_0_25px_rgba(16,185,129,0.3)] transition-all duration-200 tracking-wider uppercase border border-emerald-300/20">
-        Start AI Chat
+      <!-- 移除所有圓角(rounded-none)，確保是標準長方形 -->
+      <button id="start-btn" class="w-64 py-4 bg-emerald-500 hover:bg-emerald-400 active:scale-98 text-slate-950 text-xl font-extrabold tracking-widest uppercase transition-all duration-200 border-2 border-emerald-300/30 shadow-[0_0_30px_rgba(16,185,129,0.4)] cursor-pointer">
+        START AI CHAT
       </button>
     </div>
 
-    <!-- AI CHAT SCREEN (Hidden initially) -->
-    <div id="chat-screen" class="hidden w-full h-[550px] bg-slate-950/80 backdrop-blur-md border border-purple-500/30 rounded-none flex flex-col shadow-2xl animate-fade-in">
+    <!-- 2. AI 聊天視窗畫面 (預設隱藏) -->
+    <div id="chat-screen" class="hidden w-full h-[550px] bg-slate-900/90 backdrop-blur-xl border border-purple-500/30 flex flex-col shadow-2xl animate-fade-in">
       
-      <!-- Chat Header -->
-      <div class="px-6 py-4 border-b border-purple-500/20 flex items-center gap-3 bg-slate-900/50">
+      <!-- 聊天室頂部資訊 -->
+      <div class="px-6 py-4 border-b border-purple-500/20 flex items-center gap-3 bg-slate-950/40">
         <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
-        <h2 class="text-purple-200 font-medium tracking-wide text-sm uppercase">Cosmos Intelligence</h2>
+        <h2 class="text-purple-300 font-bold tracking-widest text-xs uppercase">Cosmos Intelligence</h2>
       </div>
 
-      <!-- Message Area -->
-      <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4">
-        <!-- AI Response Bubble -->
+      <!-- 訊息對話區域 -->
+      <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4 text-left">
+        <!-- AI 初始歡迎訊息 -->
         <div class="flex justify-start">
-          <div class="max-w-[85%] px-4 py-3 bg-slate-900 border border-purple-900/60 text-purple-100 rounded-none text-sm leading-relaxed">
-            System Online. Transmission stable. How can I assist your cosmic inquiry today?
+          <div class="max-w-[85%] px-4 py-3 bg-slate-950 border border-purple-900/80 text-purple-100 text-sm leading-relaxed">
+            系統已連線。傳輸頻道穩定。今天有什麼需要為您解答的星際指令？
           </div>
         </div>
       </div>
 
-      <!-- Input Form Layout -->
-      <form id="chat-form" class="p-4 border-t border-purple-500/20 flex gap-2 bg-slate-900/30">
-        <input type="text" id="chat-input" placeholder="Type a transmission..." required autocomplete="off"
-          class="flex-1 bg-slate-950 text-purple-100 placeholder-purple-400/30 px-4 py-3 rounded-none border border-purple-500/20 focus:outline-none focus:border-emerald-500 transition-colors text-sm" />
-        <button type="submit" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-none text-sm uppercase tracking-wider transition-colors">
-          Send
+      <!-- 輸入框表單 -->
+      <form id="chat-form" class="p-4 border-t border-purple-500/20 flex gap-2 bg-slate-950/40">
+        <input type="text" id="chat-input" placeholder="請輸入訊息..." required autocomplete="off"
+          class="flex-1 bg-slate-950 text-purple-100 placeholder-purple-400/30 px-4 py-3 border border-purple-500/30 focus:outline-none focus:border-emerald-500 transition-colors text-sm" />
+        <button type="submit" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm uppercase tracking-wider transition-colors cursor-pointer">
+          發送
         </button>
       </form>
 
     </div>
   </div>
 
-  <!-- JavaScript Application Logic -->
+  <!-- 前端功能邏輯 JavaScript -->
   <script>
     const startScreen = document.getElementById('start-screen');
     const chatScreen = document.getElementById('chat-screen');
@@ -88,22 +93,22 @@
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
 
-    // UI View transition
+    // 點擊長方形按鈕切換到聊天畫面
     startBtn.addEventListener('click', () => {
-      startScreen.classList.add('hidden');
-      chatScreen.classList.remove('hidden');
+      startScreen.style.display = 'none';
+      chatScreen.style.display = 'flex';
     });
 
-    // Message Renderer helper
+    // 渲染對話泡泡
     function appendMessage(text, role) {
       const wrapper = document.createElement('div');
       wrapper.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'}`;
 
       const bubble = document.createElement('div');
-      bubble.className = `max-w-[85%] px-4 py-3 text-sm leading-relaxed rounded-none ${
+      bubble.className = `max-w-[85%] px-4 py-3 text-sm leading-relaxed ${
         role === 'user'
           ? 'bg-purple-700 border border-purple-500/40 text-white'
-          : 'bg-slate-900 border border-purple-900/60 text-purple-100'
+          : 'bg-slate-950 border border-purple-900/80 text-purple-100'
       }`;
       bubble.textContent = text;
 
@@ -112,7 +117,7 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Input monitoring submission
+    // 表單發送事件
     chatForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const messageText = chatInput.value.trim();
@@ -121,10 +126,10 @@
       appendMessage(messageText, 'user');
       chatInput.value = '';
 
-      // Simulated automated space network reply
+      // 模擬 AI 回覆
       setTimeout(() => {
-        appendMessage(`Signal received: "${messageText}". Static cloud frontend connection functional. Ready for API routing configuration!`, 'ai');
-      }, 950);
+        appendMessage(`已接收到訊號： "${messageText}"。目前為前端靜態展示，已成功與 Vercel 雲端平台建立部署連接！`, 'ai');
+      }, 800);
     });
   </script>
 </body>
