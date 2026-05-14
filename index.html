@@ -1,225 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Galaxy AI Chat Engine</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    body {
-      background: radial-gradient(ellipse at bottom, #0f172a 0%, #020617 100%);
-      min-height: 100vh;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
-      overflow: hidden;
-      position: relative;
-    }
-
-    body::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-image: 
-        radial-gradient(1px 1px at 30px 40px, #ffffff, rgba(0,0,0,0)),
-        radial-gradient(1.5px 1.5px at 150px 180px, #ffffff, rgba(0,0,0,0)),
-        radial-gradient(1px 1px at 280px 120px, #ffffff, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 80px 320px, rgba(255,255,255,0.7), rgba(0,0,0,0)),
-        radial-gradient(1.5px 1.5px at 350px 250px, #ffffff, rgba(0,0,0,0));
-      background-size: 400px 400px;
-      opacity: 0.5;
-      z-index: 1;
-    }
-
-    .nebula-1 {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 30% 35%, rgba(147, 51, 234, 0.25), transparent 60%);
-      z-index: 2;
-    }
-    .nebula-2 {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 70% 65%, rgba(59, 130, 246, 0.18), transparent 60%);
-      z-index: 2;
-    }
-
-    .container {
-      position: relative;
-      z-index: 10;
-      width: 100%;
-      max-width: 440px;
-      padding: 0 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .start-btn {
-      width: 260px;
-      padding: 16px 0;
-      background-color: #10b981;
-      color: #020617;
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      border: 2px solid rgba(167, 243, 208, 0.3);
-      border-radius: 0px !important;
-      cursor: pointer;
-      box-shadow: 0 0 35px rgba(16, 185, 129, 0.45);
-      transition: all 0.2s ease;
-    }
-    .start-btn:hover {
-      background-color: #34d399;
-      box-shadow: 0 0 45px rgba(52, 211, 153, 0.6);
-    }
-    .start-btn:active { transform: scale(0.97); }
-
-    .chat-window {
-      display: none;
-      width: 100%;
-      height: 550px;
-      background-color: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(168, 85, 247, 0.3);
-      border-radius: 0px !important;
-      flex-direction: column;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      animation: fadeIn 0.35s ease-out forwards;
-    }
-
-    .chat-header {
-      padding: 16px 24px;
-      border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background-color: rgba(2, 6, 23, 0.4);
-    }
-    .online-indicator {
-      width: 10px;
-      height: 10px;
-      background-color: #10b981;
-      border-radius: 50%;
-    }
-    .chat-title {
-      color: #d8b4fe;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background: radial-gradient(ellipse at bottom, #0f172a 0%, #020617 100%); min-height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; color: #ffffff; overflow: hidden; position: relative; }
+    body::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(1px 1px at 30px 40px, #ffffff, rgba(0,0,0,0)), radial-gradient(1.5px 1.5px at 150px 180px, #ffffff, rgba(0,0,0,0)), radial-gradient(1px 1px at 280px 120px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 80px 320px, rgba(255,255,255,0.7), rgba(0,0,0,0)), radial-gradient(1.5px 1.5px at 350px 250px, #ffffff, rgba(0,0,0,0)); background-size: 400px 400px; opacity: 0.5; z-index: 1; }
+    .nebula-1 { position: absolute; inset: 0; background: radial-gradient(circle at 30% 35%, rgba(147, 51, 234, 0.25), transparent 60%); z-index: 2; }
+    .nebula-2 { position: absolute; inset: 0; background: radial-gradient(circle at 70% 65%, rgba(59, 130, 246, 0.18), transparent 60%); z-index: 2; }
+    .container { position: relative; z-index: 10; width: 100%; max-width: 440px; padding: 0 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .start-btn { width: 260px; padding: 16px 0; background-color: #10b981; color: #020617; font-size: 20px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; border: 2px solid rgba(167, 243, 208, 0.3); border-radius: 0px !important; cursor: pointer; box-shadow: 0 0 35px rgba(16, 185, 129, 0.45); transition: all 0.2s ease; }
+    .start-btn:hover { background-color: #34d399; box-shadow: 0 0 45px rgba(52, 211, 153, 0.6); }
+    .chat-window { display: none; width: 100%; height: 550px; background-color: rgba(15, 23, 42, 0.85); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 0px !important; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: fadeIn 0.35s ease-out forwards; }
+    .chat-header { padding: 16px 24px; border-bottom: 1px solid rgba(168, 85, 247, 0.2); display: flex; align-items: center; gap: 12px; background-color: rgba(2, 6, 23, 0.4); }
+    .online-indicator { width: 10px; height: 10px; background-color: #10b981; border-radius: 50%; }
+    .chat-title { color: #d8b4fe; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
     .message-row { display: flex; width: 100%; }
     .row-ai { justify-content: flex-start; }
     .row-user { justify-content: flex-end; }
-
-    .bubble {
-      max-width: 85%;
-      padding: 12px 18px;
-      font-size: 14px;
-      line-height: 1.6;
-      border-radius: 0px !important;
-      text-align: left;
-    }
-    .bubble-ai {
-      background-color: #090d16;
-      border: 1px solid rgba(147, 51, 234, 0.4);
-      color: #f3e8ff;
-    }
-    .bubble-user {
-      background-color: #7e22ce;
-      border: 1px solid rgba(168, 85, 247, 0.5);
-      color: #ffffff;
-    }
-
-    .chat-form {
-      padding: 16px;
-      border-top: 1px solid rgba(168, 85, 247, 0.2);
-      display: flex;
-      gap: 10px;
-      background-color: rgba(2, 6, 23, 0.4);
-    }
-    .chat-input {
-      flex: 1;
-      background-color: #020617;
-      color: #f3e8ff;
-      border: 1px solid rgba(168, 85, 247, 0.3);
-      padding: 12px 16px;
-      font-size: 14px;
-      outline: none;
-    }
-    .chat-input:focus { border-color: #10b981; }
-    .chat-input::placeholder { color: rgba(168, 85, 247, 0.4); }
-    
-    .send-btn {
-      padding: 0 24px;
-      background-color: #10b981;
-      color: #020617;
-      font-weight: 700;
-      font-size: 14px;
-      border: none;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .send-btn:hover { background-color: #34d399; }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.98); }
-      to { opacity: 1; transform: scale(1); }
-    }
+    .bubble { max-width: 85%; padding: 12px 18px; font-size: 14px; line-height: 1.6; border-radius: 0px !important; text-align: left; }
+    .bubble-ai { background-color: #090d16; border: 1px solid rgba(147, 51, 234, 0.4); color: #f3e8ff; }
+    .bubble-user { background-color: #7e22ce; border: 1px solid rgba(168, 85, 247, 0.5); color: #ffffff; }
+    .chat-form { padding: 16px; border-top: 1px solid rgba(168, 85, 247, 0.2); display: flex; gap: 10px; background-color: rgba(2, 6, 23, 0.4); }
+    .chat-input { flex: 1; background-color: #020617; color: #f3e8ff; border: 1px solid rgba(168, 85, 247, 0.3); padding: 12px 16px; font-size: 14px; outline: none; }
+    .send-btn { padding: 0 24px; background-color: #10b981; color: #020617; font-weight: 700; font-size: 14px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
   </style>
 </head>
 <body>
-
   <div class="nebula-1"></div>
   <div class="nebula-2"></div>
-
   <div class="container">
     <div id="start-screen">
       <button id="start-btn" class="start-btn">START AI CHAT</button>
     </div>
-
     <div id="chat-screen" class="chat-window">
       <div class="chat-header">
         <div class="online-indicator"></div>
         <div class="chat-title">Cosmos Intelligence Engine</div>
       </div>
-
       <div id="chat-messages" class="chat-messages">
         <div class="message-row row-ai">
           <div class="bubble bubble-ai">
-            System Online. Core database loaded with global knowledge. Ask me anything directly!
+            System Online. Say "OpenAI-" to access the advanced neural network, or ask me anything local!
           </div>
         </div>
       </div>
-
       <form id="chat-form" class="chat-form">
         <input type="text" id="chat-input" class="chat-input" placeholder="Ask any question..." required autocomplete="off" />
         <button type="submit" class="send-btn">Send</button>
       </form>
     </div>
   </div>
-
   <script>
     const startScreen = document.getElementById('start-screen');
     const chatScreen = document.getElementById('chat-screen');
@@ -228,17 +63,10 @@
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
 
-    // Upgraded Keyword Array mapping for high accuracy
     const knowledgeDatabase = [
       { keywords: ["boss", "leader", "owner"], answer: "sahal is my boss!" },
       { keywords: ["who make", "who made", "creator", "developed", "built this"], answer: "Jacky made it!" },
-      { keywords: ["roblox", "ceo", "baszucki"], answer: "The co-founder and current CEO of Roblox is David Baszucki." },
-      { keywords: ["mars", "earth", "distance"], answer: "Currently, Mars is approximately 332 million kilometers (206 million miles) away from Earth." },
-      { keywords: ["light", "speed"], answer: "The speed of light is 299,792 kilometers per second (about 186,282 miles per second)." },
-      { keywords: ["hello", "hi", "hey"], answer: "Hello! Welcome to the interstellar AI system. How can I assist you today?" },
-      { keywords: ["who are you", "your name"], answer: "I am Cosmos Intelligence, an automated smart assistant running live on Vercel." },
-      { keywords: ["apple", "ceo", "cook"], answer: "The current CEO of Apple is Tim Cook." },
-      { keywords: ["tesla", "musk", "spacex"], answer: "The CEO of Tesla and SpaceX is Elon Musk." }
+      { keywords: ["hello", "hi", "hey"], answer: "Hello! Welcome to the interstellar AI system." }
     ];
 
     startBtn.addEventListener('click', () => {
@@ -255,36 +83,25 @@
       wrapper.appendChild(bubble);
       chatMessages.appendChild(wrapper);
       chatMessages.scrollTop = chatMessages.scrollHeight;
+      return bubble;
     }
 
-    // New Smart Fuzzy Search Matching Engine
-    function queryKnowledgeBase(input) {
-      let cleanInput = input.toLowerCase().trim();
-
-      // 1. Loop through data and test if user text includes ANY of the smart keywords
-      for (let item of knowledgeDatabase) {
-        let isMatch = item.keywords.some(kw => cleanInput.includes(kw));
-        if (isMatch) {
-          return item.answer;
-        }
+    async function getSmartResponse(userInput) {
+      // Calls your /api/chat serverless function
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: userInput })
+        });
+        const data = await response.json();
+        return data.answer;
+      } catch (err) {
+        return "Connection error to the OpenAI core.";
       }
-
-      // 2. Process General Mathematical Calculations
-      let mathExpression = cleanInput.replace(/[^0-9+\-*/().]/g, '');
-      if (mathExpression.length > 0 && /[0-9]/.test(mathExpression)) {
-        try {
-          const result = new Function(`return ${mathExpression}`)();
-          if (result !== undefined && !isNaN(result)) {
-            return `🪐 Calculation Complete:\n${input} = ${result}`;
-          }
-        } catch (e) {}
-      }
-
-      // 3. Fallback Reply
-      return `Cosmos Database Update: I've logged your request: "${input}". Let Jacky know if you want to add a unique answer configuration for this text phrase!`;
     }
 
-    chatForm.addEventListener('submit', (e) => {
+    document.getElementById('chat-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const text = chatInput.value.trim();
       if (!text) return;
@@ -292,10 +109,22 @@
       appendMessage(text, 'user');
       chatInput.value = '';
 
-      setTimeout(() => {
-        const answer = queryKnowledgeBase(text);
-        appendMessage(answer, 'ai');
-      }, 450);
+      if (text.toLowerCase().startsWith("openai-")) {
+        // Remove "OpenAI-" and send the rest to OpenAI
+        const prompt = text.substring(7).trim();
+        const loadingBubble = appendMessage("Thinking via OpenAI...", "ai");
+        const answer = await getSmartResponse(prompt);
+        loadingBubble.textContent = answer;
+      } else {
+        // Local responses
+        const found = knowledgeDatabase.find(item =>
+          item.keywords.some(kw => text.toLowerCase().includes(kw))
+        );
+        const answer = found
+          ? found.answer
+          : `Cosmos Database: logged "${text}". (Use "OpenAI-" before your question for AI responses!)`;
+        setTimeout(() => appendMessage(answer, 'ai'), 450);
+      }
     });
   </script>
 </body>
