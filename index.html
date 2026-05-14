@@ -74,14 +74,10 @@
       letter-spacing: 2px;
       text-transform: uppercase;
       border: 2px solid rgba(167, 243, 208, 0.3);
-      border-radius: 0px !important;
+      border-radius: 0px;
       cursor: pointer;
       box-shadow: 0 0 35px rgba(16, 185, 129, 0.45);
       transition: all 0.2s ease;
-    }
-    .start-btn:hover {
-      background-color: #34d399;
-      box-shadow: 0 0 45px rgba(52, 211, 153, 0.6);
     }
 
     .chat-window {
@@ -90,7 +86,7 @@
       height: 600px;
       background-color: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(168, 85, 247, 0.3);
-      border-radius: 0px !important;
+      border-radius: 0px;
       flex-direction: column;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
       animation: fadeIn 0.35s ease-out forwards;
@@ -127,29 +123,29 @@
       gap: 16px;
     }
 
-    /* Suggestion Chips */
     .suggestion-container {
-      padding: 10px 24px;
+      padding: 12px 16px;
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      background-color: rgba(2, 6, 23, 0.2);
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 10px;
+      background-color: rgba(2, 6, 23, 0.3);
+      border-top: 1px solid rgba(168, 85, 247, 0.1);
+      scrollbar-width: none;
     }
+    .suggestion-container::-webkit-scrollbar { display: none; }
+
     .suggest-btn {
+      flex: 0 0 auto;
       background: rgba(147, 51, 234, 0.1);
       border: 1px solid rgba(147, 51, 234, 0.4);
       color: #d8b4fe;
-      padding: 6px 12px;
+      padding: 8px 14px;
       font-size: 11px;
       font-weight: 600;
       text-transform: uppercase;
       cursor: pointer;
-      transition: all 0.2s;
-    }
-    .suggest-btn:hover {
-      background: rgba(16, 185, 129, 0.2);
-      border-color: #10b981;
-      color: #ffffff;
+      white-space: nowrap;
     }
 
     .message-row { display: flex; width: 100%; }
@@ -161,8 +157,8 @@
       padding: 12px 18px;
       font-size: 14px;
       line-height: 1.6;
-      border-radius: 0px !important;
-      white-space: pre-line; /* Allows new lines in the response */
+      border-radius: 0px;
+      white-space: pre-line;
     }
     .bubble-ai {
       background-color: #090d16;
@@ -210,7 +206,7 @@
 <body>
 
   <div class="nebula-1"></div>
-  <div class="nebula-2"></div>
+  <div class="nebula-2 :"></div>
 
   <div class="container">
     <div id="start-screen">
@@ -226,19 +222,21 @@
       <div id="chat-messages" class="chat-messages">
         <div class="message-row row-ai">
           <div class="bubble bubble-ai">
-            System Online. Choose a data request below:
+            System Online. 
+            To add a person, use: **-CM Name Info**
           </div>
         </div>
       </div>
 
       <div class="suggestion-container">
-        <button class="suggest-btn" onclick="askQuestion('Classmate database')">Classmate database</button>
-        <button class="suggest-btn" onclick="askQuestion('Who is your boss?')">Boss Info</button>
-        <button class="suggest-btn" onclick="askQuestion('42')">Code 42</button>
+        <button class="suggest-btn" onclick="askQuestion('database')">Show Database</button>
+        <button class="suggest-btn" onclick="askQuestion('paddy')">Paddy</button>
+        <button class="suggest-btn" onclick="askQuestion('marcus')">Marcus</button>
+        <button class="suggest-btn" onclick="askQuestion('boss')">Boss Info</button>
       </div>
 
       <form id="chat-form" class="chat-form">
-        <input type="text" id="chat-input" class="chat-input" placeholder="Ask about classmates or info..." required autocomplete="off" />
+        <input type="text" id="chat-input" class="chat-input" placeholder="Ask or use -CM to add..." required autocomplete="off" />
         <button type="submit" class="send-btn">Send</button>
       </form>
     </div>
@@ -252,16 +250,16 @@
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
 
-    // Updated Knowledge Database with Classmate Info
-    const knowledgeDatabase = [
+    // Initial Database
+    let knowledgeDatabase = [
       { 
-        keywords: ["classmate", "database", "paddy", "marcus", "2d23", "2d18"], 
-        answer: "📂 Classmate Database Records:\n\n2D 23(麥栢林paddy)\nHobby: gooning, date with girls, talk with girlfriends.\nFavourite subject: English\nBest friends: kiki, Tiffany\nCrush: 2, 3, 7, 11\n\n------------------\n\n2D18(朱程諾marcus)\nHobby: gooning, attention seeking, talk with girlfriends.\nFavourite subject: CHINESE HISTORY\nBest friends: Emily, Ada, Ellen, Emma, George\nCrush: 2, 3, 14" 
+        keywords: ["paddy", "2d23"], 
+        answer: "2D 23(麥栢林paddy)\nHobby: gooning, date with girls.\nFavourite subject: English\nCrush: 2, 3, 7, 11" 
       },
-      { keywords: ["42"], answer: "2,3,7 in the class.those who know" },
-      { keywords: ["boss", "leader", "owner", "sahal"], answer: "sahal is my boss!" },
-      { keywords: ["who make", "who made", "jacky"], answer: "Jacky made it!" },
-      { keywords: ["hello", "hi"], answer: "System greetings active. How can I assist you?" }
+      { 
+        keywords: ["marcus", "2d18"], 
+        answer: "2D18(朱程諾marcus)\nHobby: attention seeking.\nFavourite subject: CHINESE HISTORY\nCrush: 2, 3, 14" 
+      }
     ];
 
     startBtn.addEventListener('click', () => {
@@ -290,14 +288,42 @@
 
       setTimeout(() => {
         let cleanInput = text.toLowerCase().trim();
-        let response = `System Logging: "${text}". No direct match found in local sectors.`;
+        let response = "Sector scan complete. No data found.";
 
+        // --- NEW FEATURE: ADD CLASSMATE COMMAND ---
+        if (cleanInput.startsWith("-cm")) {
+          const entry = text.substring(3).trim(); // Remove "-CM"
+          const firstWord = entry.split(" ")[0].toLowerCase(); // Use first word as keyword
+          
+          knowledgeDatabase.push({
+            keywords: [firstWord],
+            answer: `📂 NEW DATA LOGGED:\n\n${entry}`
+          });
+          
+          response = `Target "${firstWord}" has been uploaded to the local database.`;
+          appendMessage(response, 'ai');
+          return;
+        }
+
+        // --- SHOW DATABASE COMMAND ---
+        if (cleanInput === "database" || cleanInput === "show database") {
+            response = "Current Records:\n\n" + knowledgeDatabase.map(i => i.answer).join("\n\n---\n\n");
+            appendMessage(response, 'ai');
+            return;
+        }
+
+        // --- NORMAL SEARCH ---
         for (let item of knowledgeDatabase) {
           if (item.keywords.some(kw => cleanInput.includes(kw))) {
             response = item.answer;
             break;
           }
         }
+        
+        // Default responses for boss/creator
+        if (cleanInput.includes("boss")) response = "Sahal is the boss!";
+        if (cleanInput.includes("jacky")) response = "Jacky is the creator.";
+
         appendMessage(response, 'ai');
       }, 450);
     }
