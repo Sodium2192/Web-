@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Galaxy AI Chat & Encyclopedia</title>
   <style>
-    /* 全域重設與字體 */
+    /* Global Reset & Typography */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -13,7 +13,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    /* 深邃紫藍色銀河背景 */
+    /* Deep Space Purple/Blue Galaxy Background */
     body {
       background: radial-gradient(ellipse at bottom, #0f172a 0%, #020617 100%);
       min-height: 100vh;
@@ -26,7 +26,7 @@
       position: relative;
     }
 
-    /* 星空微光點綴 */
+    /* Starfield Dot Effects */
     body::before {
       content: "";
       position: absolute;
@@ -42,7 +42,7 @@
       z-index: 1;
     }
 
-    /* 星雲色彩氛圍 */
+    /* Cosmic Nebula Overlays */
     .nebula-1 {
       position: absolute;
       inset: 0;
@@ -56,7 +56,7 @@
       z-index: 2;
     }
 
-    /* 介面主容器 */
+    /* Layout Main Container */
     .container {
       position: relative;
       z-index: 10;
@@ -69,7 +69,7 @@
       justify-content: center;
     }
 
-    /* 綠色長方形按鈕 */
+    /* Green Rectangle Start Button (No Rounded Corners) */
     .start-btn {
       width: 260px;
       padding: 16px 0;
@@ -91,7 +91,7 @@
     }
     .start-btn:active { transform: scale(0.97); }
 
-    /* AI 聊天室主架構 */
+    /* AI Chat Window Dashboard */
     .chat-window {
       display: none;
       width: 100%;
@@ -202,10 +202,12 @@
   <div class="nebula-2"></div>
 
   <div class="container">
+    <!-- 1. START SCREEN -->
     <div id="start-screen">
       <button id="start-btn" class="start-btn">START AI CHAT</button>
     </div>
 
+    <!-- 2. AI CHAT WINDOW (All English UI) -->
     <div id="chat-screen" class="chat-window">
       <div class="chat-header">
         <div class="online-indicator"></div>
@@ -215,14 +217,14 @@
       <div id="chat-messages" class="chat-messages">
         <div class="message-row row-ai">
           <div class="bubble bubble-ai">
-            系統已更新！我現在內建了網路常識與百科資料庫。你可以問我數學題、或者「誰是 Roblox 的 CEO？」試試看！
+            System online. Database loaded successfully. You can ask me math questions or knowledge facts like "Who made this?" or "Who is the CEO of Roblox?".
           </div>
         </div>
       </div>
 
       <form id="chat-form" class="chat-form">
-        <input type="text" id="chat-input" class="chat-input" placeholder="問我任何常識問題或輸入計算題..." required autocomplete="off" />
-        <button type="submit" class="send-btn">發送</button>
+        <input type="text" id="chat-input" class="chat-input" placeholder="Ask a question or enter math..." required autocomplete="off" />
+        <button type="submit" class="send-btn">Send</button>
       </form>
     </div>
   </div>
@@ -235,71 +237,75 @@
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
 
-    // 1. 本地擴充常識資料庫
+    // 1. Upgraded English Knowledge Base
     const generalKnowledgeDB = [
       {
-        keywords: ["roblox", "ceo", "執行長", "老闆"],
-        answer: "Roblox 的共同創辦人兼現任 CEO 是 David Baszucki（大衛·巴祖奇），他在網路上的使用者名稱是 Builderman。"
+        keywords: ["who make", "who made", "creator", "developer", "owner"],
+        answer: "Jacky made it!"
       },
       {
-        keywords: ["你好", "hello", "hi"],
-        answer: "你好！歡迎連線到星際 AI 系統，很高興為你服務。"
+        keywords: ["roblox", "ceo"],
+        answer: "The co-founder and current CEO of Roblox is David Baszucki. His in-game username is Builderman."
       },
       {
-        keywords: ["你是誰", "who are you"],
-        answer: "我是 Cosmos Intelligence，一個部署在 Vercel 上的智慧靜態前端網頁助手。"
+        keywords: ["hello", "hi", "hey"],
+        answer: "Hello! Welcome to the interstellar AI system. How can I assist you today?"
       },
       {
-        keywords: ["apple", "蘋果", "tim cook"],
-        answer: "Apple 的現任 CEO 是 Tim Cook（蒂姆·庫克）。"
+        keywords: ["who are you", "your name"],
+        answer: "I am Cosmos Intelligence, a smart web assistant running live on Vercel cloud hosting."
       },
       {
-        keywords: ["tesla", "特斯​​拉", "musk", "馬斯克"],
-        answer: "Tesla 和 SpaceX 的執行長（CEO）是著名企業家 Elon Musk（伊隆·馬斯克）。"
+        keywords: ["apple", "tim cook"],
+        answer: "The current CEO of Apple is Tim Cook."
+      },
+      {
+        keywords: ["tesla", "musk", "spacex"],
+        answer: "The CEO of Tesla and SpaceX is Elon Musk."
       }
     ];
 
-    // 2. 核心大腦解析引擎 (包含關鍵字模糊比對與四則運算)
+    // 2. Core Intelligent Processor
     function processAiResponse(input) {
       let cleanInput = input.trim().toLowerCase();
 
-      // 先跑一遍資料庫比對：如果句子包含該主題的關鍵字組合（例如同時有 roblox 和 ceo）
+      // Check Encyclopedia Database with smart fuzzy matching
       for (let item of generalKnowledgeDB) {
         let isMatch = item.keywords.every(keyword => cleanInput.includes(keyword)) || 
-                      (item.keywords.includes(cleanInput));
+                      item.keywords.some(keyword => cleanInput === keyword || cleanInput.startsWith(keyword));
         if (isMatch) {
           return item.answer;
         }
       }
 
-      // 如果不是常識，檢查是否是純四則運算題
+      // Check if it's a basic math calculation problem
       let mathExpression = cleanInput.replace(/[^0-9+\-*/().]/g, '');
       if (mathExpression.length > 0 && /[0-9]/.test(mathExpression)) {
         try {
           const result = new Function(`return ${mathExpression}`)();
           if (result !== undefined && !isNaN(result)) {
-            return `🪐 運算分析結果：\n${input} = ${result}`;
+            return `🪐 Calculation Result:\n${input} = ${result}`;
           }
         } catch (e) {}
       }
 
-      // 預設未知回覆
-      return `已接收到指令："${input}"。\n目前我是基於網頁本地資料庫庫運行，如果需要我像真正的 ChatGPT 一樣回答世界上「所有」天馬行空的問題，我們可以為網頁添加一段 OpenAI API 密鑰程式碼，你想現在升級串接嗎？`;
+      // Default Response fallback in English
+      return `Received signal: "${input}".\nI am currently running on a local local-database. If you want me to answer complex questions like a real ChatGPT, we can connect an OpenAI API key. Would you like to upgrade this now?`;
     }
 
-    // 切換畫面
+    // Toggle Screen Interface
     startBtn.addEventListener('click', () => {
       startScreen.style.display = 'none';
       chatScreen.style.display = 'flex';
     });
 
-    // 表單發送
+    // Form Submit Transmission Handling
     chatForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const text = chatInput.value.trim();
       if (!text) return;
 
-      // 畫面上渲染使用者問題
+      // Render User Message
       const uRow = document.createElement('div');
       uRow.className = 'message-row row-user';
       const uBubble = document.createElement('div');
@@ -311,7 +317,7 @@
       chatInput.value = '';
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
-      // 延時後渲染 AI 分析解答
+      // Render AI Response after short delay
       setTimeout(() => {
         const aiAnswer = processAiResponse(text);
 
