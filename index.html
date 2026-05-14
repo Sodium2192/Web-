@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Galaxy AI Chat & Encyclopedia</title>
+  <title>Galaxy AI Chat & OpenAI System</title>
   <style>
-    /* Global Reset & Typography */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -13,7 +12,6 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    /* Deep Space Purple/Blue Galaxy Background */
     body {
       background: radial-gradient(ellipse at bottom, #0f172a 0%, #020617 100%);
       min-height: 100vh;
@@ -26,7 +24,6 @@
       position: relative;
     }
 
-    /* Starfield Dot Effects */
     body::before {
       content: "";
       position: absolute;
@@ -42,7 +39,6 @@
       z-index: 1;
     }
 
-    /* Cosmic Nebula Overlays */
     .nebula-1 {
       position: absolute;
       inset: 0;
@@ -56,7 +52,6 @@
       z-index: 2;
     }
 
-    /* Layout Main Container */
     .container {
       position: relative;
       z-index: 10;
@@ -69,7 +64,6 @@
       justify-content: center;
     }
 
-    /* Green Rectangle Start Button (No Rounded Corners) */
     .start-btn {
       width: 260px;
       padding: 16px 0;
@@ -89,9 +83,7 @@
       background-color: #34d399;
       box-shadow: 0 0 45px rgba(52, 211, 153, 0.6);
     }
-    .start-btn:active { transform: scale(0.97); }
 
-    /* AI Chat Window Dashboard */
     .chat-window {
       display: none;
       width: 100%;
@@ -105,12 +97,17 @@
     }
 
     .chat-header {
-      padding: 16px 24px;
+      padding: 12px 20px;
       border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background-color: rgba(2, 6, 23, 0.4);
+    }
+    .header-top {
       display: flex;
       align-items: center;
       gap: 12px;
-      background-color: rgba(2, 6, 23, 0.4);
     }
     .online-indicator {
       width: 10px;
@@ -124,6 +121,15 @@
       font-weight: 700;
       letter-spacing: 2px;
       text-transform: uppercase;
+    }
+    .key-input {
+      width: 100%;
+      background: #020617;
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: #10b981;
+      font-size: 11px;
+      padding: 6px 10px;
+      outline: none;
     }
 
     .chat-messages {
@@ -175,7 +181,6 @@
       outline: none;
     }
     .chat-input:focus { border-color: #10b981; }
-    .chat-input::placeholder { color: rgba(168, 85, 247, 0.4); }
     
     .send-btn {
       padding: 0 24px;
@@ -186,9 +191,7 @@
       border: none;
       cursor: pointer;
       text-transform: uppercase;
-      letter-spacing: 1px;
     }
-    .send-btn:hover { background-color: #34d399; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.98); }
@@ -202,28 +205,30 @@
   <div class="nebula-2"></div>
 
   <div class="container">
-    <!-- 1. START SCREEN -->
     <div id="start-screen">
       <button id="start-btn" class="start-btn">START AI CHAT</button>
     </div>
 
-    <!-- 2. AI CHAT WINDOW (All English UI) -->
     <div id="chat-screen" class="chat-window">
       <div class="chat-header">
-        <div class="online-indicator"></div>
-        <div class="chat-title">Cosmos Intelligence</div>
+        <div class="header-top">
+          <div class="online-indicator"></div>
+          <div class="chat-title">Cosmos Intelligence (OpenAI Engine)</div>
+        </div>
+        <!-- Input field where you or your users insert the OpenAI API token safely -->
+        <input type="password" id="api-key-input" class="key-input" placeholder="Paste OpenAI API Key (sk-...) here to use live intelligence" />
       </div>
 
       <div id="chat-messages" class="chat-messages">
         <div class="message-row row-ai">
           <div class="bubble bubble-ai">
-            System online. Database loaded successfully. You can ask me math questions or knowledge facts like "Who made this?" or "Who is the CEO of Roblox?".
+            System Online. Custom commands configured. Type any custom statement or paste your OpenAI key above to unlock full smart answers!
           </div>
         </div>
       </div>
 
       <form id="chat-form" class="chat-form">
-        <input type="text" id="chat-input" class="chat-input" placeholder="Ask a question or enter math..." required autocomplete="off" />
+        <input type="text" id="chat-input" class="chat-input" placeholder="Type your message..." required autocomplete="off" />
         <button type="submit" class="send-btn">Send</button>
       </form>
     </div>
@@ -236,101 +241,117 @@
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
+    const apiKeyInput = document.getElementById('api-key-input');
 
-    // 1. Upgraded English Knowledge Base
-    const generalKnowledgeDB = [
+    // Custom commands that overwrite standard OpenAI completions
+    const customDatabase = [
       {
-        keywords: ["who make", "who made", "creator", "developer", "owner"],
+        keywords: ["boss", "your boss", "ur boss"],
+        answer: "Jacky is my boss!"
+      },
+      {
+        keywords: ["who make", "who made", "creator"],
         answer: "Jacky made it!"
       },
       {
         keywords: ["roblox", "ceo"],
-        answer: "The co-founder and current CEO of Roblox is David Baszucki. His in-game username is Builderman."
-      },
-      {
-        keywords: ["hello", "hi", "hey"],
-        answer: "Hello! Welcome to the interstellar AI system. How can I assist you today?"
-      },
-      {
-        keywords: ["who are you", "your name"],
-        answer: "I am Cosmos Intelligence, a smart web assistant running live on Vercel cloud hosting."
-      },
-      {
-        keywords: ["apple", "tim cook"],
-        answer: "The current CEO of Apple is Tim Cook."
-      },
-      {
-        keywords: ["tesla", "musk", "spacex"],
-        answer: "The CEO of Tesla and SpaceX is Elon Musk."
+        answer: "The CEO of Roblox is David Baszucki."
       }
     ];
 
-    // 2. Core Intelligent Processor
-    function processAiResponse(input) {
-      let cleanInput = input.trim().toLowerCase();
-
-      // Check Encyclopedia Database with smart fuzzy matching
-      for (let item of generalKnowledgeDB) {
-        let isMatch = item.keywords.every(keyword => cleanInput.includes(keyword)) || 
-                      item.keywords.some(keyword => cleanInput === keyword || cleanInput.startsWith(keyword));
-        if (isMatch) {
-          return item.answer;
-        }
-      }
-
-      // Check if it's a basic math calculation problem
-      let mathExpression = cleanInput.replace(/[^0-9+\-*/().]/g, '');
-      if (mathExpression.length > 0 && /[0-9]/.test(mathExpression)) {
-        try {
-          const result = new Function(`return ${mathExpression}`)();
-          if (result !== undefined && !isNaN(result)) {
-            return `🪐 Calculation Result:\n${input} = ${result}`;
-          }
-        } catch (e) {}
-      }
-
-      // Default Response fallback in English
-      return `Received signal: "${input}".\nI am currently running on a local local-database. If you want me to answer complex questions like a real ChatGPT, we can connect an OpenAI API key. Would you like to upgrade this now?`;
-    }
-
-    // Toggle Screen Interface
     startBtn.addEventListener('click', () => {
       startScreen.style.display = 'none';
       chatScreen.style.display = 'flex';
     });
 
-    // Form Submit Transmission Handling
-    chatForm.addEventListener('submit', (e) => {
+    function appendMessage(text, role) {
+      const wrapper = document.createElement('div');
+      wrapper.className = `message-row ${role === 'user' ? 'row-user' : 'row-ai'}`;
+      const bubble = document.createElement('div');
+      bubble.className = `bubble ${role === 'user' ? 'bubble-user' : 'bubble-ai'}`;
+      bubble.textContent = text;
+      wrapper.appendChild(bubble);
+      chatMessages.appendChild(wrapper);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Call live OpenAI API Endpoint securely from frontend client 
+    async function getOpenAiResponse(userText, apiKey) {
+      try {
+        const response = await fetch('openai.com', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [{ role: 'user', content: userText }]
+          })
+        });
+
+        const data = await response.json();
+        if (data.choices && data.choices[0]) {
+          return data.choices[0].messages.content;
+        } else if (data.error) {
+          return `OpenAI Error: ${data.error.message}`;
+        }
+        return "No response received from cloud servers.";
+      } catch (err) {
+        return "Failed to connect to OpenAI cloud network.";
+      }
+    }
+
+    chatForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const text = chatInput.value.trim();
       if (!text) return;
 
-      // Render User Message
-      const uRow = document.createElement('div');
-      uRow.className = 'message-row row-user';
-      const uBubble = document.createElement('div');
-      uBubble.className = 'bubble bubble-user';
-      uBubble.textContent = text;
-      uRow.appendChild(uBubble);
-      chatMessages.appendChild(uRow);
-
+      appendMessage(text, 'user');
       chatInput.value = '';
-      chatMessages.scrollTop = chatMessages.scrollHeight;
 
-      // Render AI Response after short delay
-      setTimeout(() => {
-        const aiAnswer = processAiResponse(text);
+      let cleanInput = text.toLowerCase();
+      let foundCustomAnswer = null;
 
-        const aRow = document.createElement('div');
-        aRow.className = 'message-row row-ai';
-        const aBubble = document.createElement('div');
-        aBubble.className = 'bubble bubble-ai';
-        aBubble.textContent = aiAnswer;
-        aRow.appendChild(aBubble);
-        chatMessages.appendChild(aRow);
+      // 1. Check custom override conditions first
+      for (let item of customDatabase) {
+        if (item.keywords.some(keyword => cleanInput.includes(keyword))) {
+          foundCustomAnswer = item.answer;
+          break;
+        }
+      }
+
+      if (foundCustomAnswer) {
+        setTimeout(() => { appendMessage(foundCustomAnswer, 'ai'); }, 400);
+        return;
+      }
+
+      // 2. Fallback to basic arithmetic calculations
+      let mathExpression = cleanInput.replace(/[^0-9+\-*/().]/g, '');
+      if (mathExpression.length > 0 && /[0-9]/.test(mathExpression)) {
+        try {
+          const result = new Function(`return ${mathExpression}`)();
+          if (result !== undefined && !isNaN(result)) {
+            appendMessage(`Calculation Result: ${text} = ${result}`, 'ai');
+            return;
+          }
+        } catch (e) {}
+      }
+
+      // 3. Fallback to Live OpenAI Endpoint if key is present
+      const apiKey = apiKeyInput.value.trim();
+      if (apiKey.startsWith('sk-')) {
+        appendMessage("Connecting to Cosmos core network...", "ai");
+        const aiAnswer = await getOpenAiResponse(text, apiKey);
         
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }, 550);
+        // Remove the temporary loading status and add the real answer
+        chatMessages.lastElementChild.remove();
+        appendMessage(aiAnswer, 'ai');
+      } else {
+        setTimeout(() => {
+          appendMessage(`Received signal: "${text}". To fetch smart cloud answers for this question, please paste your OpenAI API key into the input field at the top.`, 'ai');
+        }, 500);
+      }
     });
   </script>
 </body>
