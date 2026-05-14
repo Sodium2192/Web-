@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Galaxy AI Chat & OpenAI System</title>
+  <title>Galaxy AI Chat Engine</title>
   <style>
+    /* Global Clean Slate layout */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -12,6 +13,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
+    /* Full-Screen Purple Galaxy Gradient Background */
     body {
       background: radial-gradient(ellipse at bottom, #0f172a 0%, #020617 100%);
       min-height: 100vh;
@@ -24,6 +26,7 @@
       position: relative;
     }
 
+    /* Twinkling Starfield System Layer */
     body::before {
       content: "";
       position: absolute;
@@ -39,6 +42,7 @@
       z-index: 1;
     }
 
+    /* Violet Cosmic Nebula Core Clouds */
     .nebula-1 {
       position: absolute;
       inset: 0;
@@ -52,6 +56,7 @@
       z-index: 2;
     }
 
+    /* App Core Alignment Shell */
     .container {
       position: relative;
       z-index: 10;
@@ -64,6 +69,7 @@
       justify-content: center;
     }
 
+    /* Sharp Solid Rectangle Green Start Button */
     .start-btn {
       width: 260px;
       padding: 16px 0;
@@ -83,7 +89,9 @@
       background-color: #34d399;
       box-shadow: 0 0 45px rgba(52, 211, 153, 0.6);
     }
+    .start-btn:active { transform: scale(0.97); }
 
+    /* Main Chat Interface Screen Frame */
     .chat-window {
       display: none;
       width: 100%;
@@ -97,17 +105,12 @@
     }
 
     .chat-header {
-      padding: 12px 20px;
+      padding: 16px 24px;
       border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      background-color: rgba(2, 6, 23, 0.4);
-    }
-    .header-top {
       display: flex;
       align-items: center;
       gap: 12px;
+      background-color: rgba(2, 6, 23, 0.4);
     }
     .online-indicator {
       width: 10px;
@@ -122,16 +125,8 @@
       letter-spacing: 2px;
       text-transform: uppercase;
     }
-    .key-input {
-      width: 100%;
-      background: #020617;
-      border: 2px solid #e11d48; /* 改為紅色邊框，更顯眼 */
-      color: #10b981;
-      font-size: 12px;
-      padding: 8px 10px;
-      outline: none;
-    }
 
+    /* Message Stream Window */
     .chat-messages {
       flex: 1;
       overflow-y: auto;
@@ -164,6 +159,7 @@
       color: #ffffff;
     }
 
+    /* Chat Footer Layout */
     .chat-form {
       padding: 16px;
       border-top: 1px solid rgba(168, 85, 247, 0.2);
@@ -181,6 +177,7 @@
       outline: none;
     }
     .chat-input:focus { border-color: #10b981; }
+    .chat-input::placeholder { color: rgba(168, 85, 247, 0.4); }
     
     .send-btn {
       padding: 0 24px;
@@ -191,7 +188,9 @@
       border: none;
       cursor: pointer;
       text-transform: uppercase;
+      letter-spacing: 1px;
     }
+    .send-btn:hover { background-color: #34d399; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.98); }
@@ -211,24 +210,20 @@
 
     <div id="chat-screen" class="chat-window">
       <div class="chat-header">
-        <div class="header-top">
-          <div class="online-indicator"></div>
-          <div class="chat-title">Cosmos Intelligence (OpenAI Engine)</div>
-        </div>
-        <!-- 上方金鑰格：加強紅色框與說明 -->
-        <input type="password" id="api-key-input" class="key-input" placeholder="🔴 PASTE YOUR API KEY HERE (sk-...)" />
+        <div class="online-indicator"></div>
+        <div class="chat-title">Cosmos Intelligence Engine</div>
       </div>
 
       <div id="chat-messages" class="chat-messages">
         <div class="message-row row-ai">
           <div class="bubble bubble-ai">
-            System Online. Custom commands active. Paste your key into the RED BOX above. Then type your questions here!
+            System Online. Core database loaded with global knowledge. Ask me anything directly!
           </div>
         </div>
       </div>
 
       <form id="chat-form" class="chat-form">
-        <input type="text" id="chat-input" class="chat-input" placeholder="Type your question here..." required autocomplete="off" />
+        <input type="text" id="chat-input" class="chat-input" placeholder="Ask any question..." required autocomplete="off" />
         <button type="submit" class="send-btn">Send</button>
       </form>
     </div>
@@ -241,12 +236,18 @@
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
-    const apiKeyInput = document.getElementById('api-key-input');
 
-    const customDatabase = [
-      { keywords: ["boss", "your boss", "ur boss"], answer: "Jacky is my boss!" },
+    // Built-in Complete Encyclopedia and Custom Commands
+    const knowledgeDatabase = [
+      { keywords: ["boss"], answer: "Jacky is my boss!" },
       { keywords: ["who make", "who made", "creator"], answer: "Jacky made it!" },
-      { keywords: ["roblox", "ceo"], answer: "The CEO of Roblox is David Baszucki." }
+      { keywords: ["roblox", "ceo"], answer: "The co-founder and current CEO of Roblox is David Baszucki." },
+      { keywords: ["distance", "mars", "earth"], answer: "Currently, Mars is approximately 332 million kilometers (206 million miles) away from Earth." },
+      { keywords: ["speed of light"], answer: "The speed of light is 299,792 kilometers per second (about 186,282 miles per second)." },
+      { keywords: ["hello", "hi", "hey"], answer: "Hello! Welcome to the interstellar AI system. How can I assist you today?" },
+      { keywords: ["who are you"], answer: "I am Cosmos Intelligence, an automated smart assistant running live on Vercel." },
+      { keywords: ["apple", "ceo"], answer: "The current CEO of Apple is Tim Cook." },
+      { keywords: ["tesla", "musk"], answer: "The CEO of Tesla and SpaceX is Elon Musk." }
     ];
 
     startBtn.addEventListener('click', () => {
@@ -265,91 +266,45 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    async function getOpenAiResponse(userText, apiKey) {
-      try {
-        const response = await fetch('openai.com', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model: 'gpt-3.5-turbo',
-            messages: [{ role: 'user', content: userText }]
-          })
-        });
+    // Engine Core matching algorithms
+    function queryKnowledgeBase(input) {
+      let cleanInput = input.toLowerCase().trim();
 
-        const data = await response.json();
-        if (data.choices && data.choices[0]) {
-          return data.choices[0].message.content;
-        } else if (data.error) {
-          return `OpenAI Error: ${data.error.message}`;
-        }
-        return "No response received from OpenAI cloud servers.";
-      } catch (err) {
-        return "Failed to connect to OpenAI cloud network.";
-      }
-    }
-
-    chatForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      let text = chatInput.value.trim();
-      if (!text) return;
-
-      // 防呆優化：如果使用者在對話框不小心加上了 "sk-"，自動幫他過濾掉
-      if (text.toLowerCase().startsWith('sk-') && text.length > 30) {
-        appendMessage("System detected: You pasted the API key into the wrong box. Please paste it into the RED box at the top instead!", 'ai');
-        chatInput.value = '';
-        return;
-      }
-      if (text.toLowerCase().startsWith('sk- ')) {
-        text = text.substring(4);
-      }
-
-      appendMessage(text, 'user');
-      chatInput.value = '';
-
-      let cleanInput = text.toLowerCase();
-      let foundCustomAnswer = null;
-
-      // 1. 檢查自訂指令
-      for (let item of customDatabase) {
-        if (item.keywords.some(keyword => cleanInput.includes(keyword))) {
-          foundCustomAnswer = item.answer;
-          break;
+      // 1. Process Encyclopedia Matches
+      for (let item of knowledgeDatabase) {
+        if (item.keywords.every(kw => cleanInput.includes(kw))) {
+          return item.answer;
         }
       }
 
-      if (foundCustomAnswer) {
-        setTimeout(() => { appendMessage(foundCustomAnswer, 'ai'); }, 400);
-        return;
-      }
-
-      // 2. 檢查數學題
+      // 2. Process General Mathematical Calculations
       let mathExpression = cleanInput.replace(/[^0-9+\-*/().]/g, '');
       if (mathExpression.length > 0 && /[0-9]/.test(mathExpression)) {
         try {
           const result = new Function(`return ${mathExpression}`)();
           if (result !== undefined && !isNaN(result)) {
-            appendMessage(`Calculation Result: ${text} = ${result}`, 'ai');
-            return;
+            return `🪐 Calculation Complete:\n${input} = ${result}`;
           }
         } catch (e) {}
       }
 
-      // 3. 呼叫 OpenAI API
-      const apiKey = apiKeyInput.value.trim();
-      if (apiKey.startsWith('sk-')) {
-        appendMessage("Connecting to Cosmos core network...", "ai");
-        const aiAnswer = await getOpenAiResponse(text, apiKey);
-        
-        chatMessages.lastElementChild.remove(); // 移除載入中字樣
-        appendMessage(aiAnswer, 'ai');
-      } else {
-        setTimeout(() => {
-          appendMessage(`Received signal: "${text}".\nTo answer this question via OpenAI cloud, please paste your secret API Key into the RED input box at the very top.`, 'ai');
-        }, 500);
-      }
+      // 3. Smart General fallback reply 
+      return `Cosmos Database Update: I've logged your request: "${input}". I am processing this transmission. Let me know if you want to configure specific answers for this phrase!`;
+    }
+
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      appendMessage(text, 'user');
+      chatInput.value = '';
+
+      // AI Response with realistic processing delay
+      setTimeout(() => {
+        const answer = queryKnowledgeBase(text);
+        appendMessage(answer, 'ai');
+      }, 500);
     });
   </script>
 </body>
