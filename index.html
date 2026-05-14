@@ -4,87 +4,253 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Galaxy AI Chat</title>
-  <!-- 修正：使用官方最新且穩定的 Tailwind CSS CDN 載入網址 -->
-  <script src="jsdelivr.net"></script>
   <style>
-    /* 星空背景底色與動態閃爍星星 */
-    .galaxy-bg {
+    /* 1. 全域重設與極簡字體 */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* 2. 深邃紫藍色銀河背景 */
+    body {
       background: radial-gradient(ellipse at bottom, #0f172a 0%, #020617 100%);
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      overflow: hidden;
       position: relative;
     }
-    .galaxy-bg::before {
+
+    /* 星空點綴效果 */
+    body::before {
       content: "";
       position: absolute;
-      inset: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background-image: 
-        radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
-        radial-gradient(1.5px 1.5px at 100px 150px, #fff, rgba(0,0,0,0)),
-        radial-gradient(1px 1px at 200px 80px, #fff, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 50px 280px, #rgba(255,255,255,0.8), rgba(0,0,0,0)),
-        radial-gradient(1.5px 1.5px at 280px 200px, #fff, rgba(0,0,0,0));
-      background-size: 300px 300px;
-      opacity: 0.6;
+        radial-gradient(1px 1px at 30px 40px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 150px 180px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 280px 120px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 80px 320px, rgba(255,255,255,0.7), rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 350px 250px, #ffffff, rgba(0,0,0,0));
+      background-size: 400px 400px;
+      opacity: 0.5;
       z-index: 1;
     }
-    /* 淡入動畫 */
+
+    /* 紫藍色星雲光暈 */
+    .nebula-1 {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 35%, rgba(147, 51, 234, 0.25), transparent 60%);
+      z-index: 2;
+    }
+    .nebula-2 {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 70% 65%, rgba(59, 130, 246, 0.18), transparent 60%);
+      z-index: 2;
+    }
+
+    /* 主容器 */
+    .container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 440px;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 3. 綠色正長方形 Start 按鈕 (完美置中、無圓角) */
+    .start-btn {
+      width: 260px;
+      padding: 16px 0;
+      background-color: #10b981; /* Emerald 500 */
+      color: #020617;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border: 2px solid rgba(167, 243, 208, 0.3);
+      border-radius: 0px !important; /* 強制去除所有圓角 */
+      cursor: pointer;
+      box-shadow: 0 0 35px rgba(16, 185, 129, 0.45);
+      transition: all 0.2s ease;
+    }
+    .start-btn:hover {
+      background-color: #34d399;
+      box-shadow: 0 0 45px rgba(52, 211, 153, 0.6);
+    }
+    .start-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* 4. AI 聊天室視窗結構 */
+    .chat-window {
+      display: none; /* 初始隱藏 */
+      width: 100%;
+      height: 550px;
+      background-color: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 0px !important; /* 強制去除所有圓角 */
+      flex-direction: column;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.35s ease-out forwards;
+    }
+
+    /* 聊天室頂部 */
+    .chat-header {
+      padding: 16px 24px;
+      border-b: 1px solid rgba(168, 85, 247, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background-color: rgba(2, 6, 23, 0.4);
+    }
+    .online-indicator {
+      width: 10px;
+      height: 10px;
+      background-color: #10b981;
+      border-radius: 50%;
+    }
+
+    .chat-title {
+      color: #d8b4fe;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* 訊息滾動區 */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* 訊息對話泡泡 */
+    .message-row {
+      display: flex;
+      width: 100%;
+    }
+    .row-ai { justify-content: flex-start; }
+    .row-user { justify-content: flex-end; }
+
+    .bubble {
+      max-width: 85%;
+      padding: 12px 18px;
+      font-size: 14px;
+      line-height: 1.6;
+      border-radius: 0px !important; /* 強制長方形外觀 */
+      text-align: left;
+    }
+    .bubble-ai {
+      background-color: #090d16;
+      border: 1px solid rgba(147, 51, 234, 0.4);
+      color: #f3e8ff;
+    }
+    .bubble-user {
+      background-color: #7e22ce;
+      border: 1px solid rgba(168, 85, 247, 0.5);
+      color: #ffffff;
+    }
+
+    /* 輸入表單區 */
+    .chat-form {
+      padding: 16px;
+      border-top: 1px solid rgba(168, 85, 247, 0.2);
+      display: flex;
+      gap: 10px;
+      background-color: rgba(2, 6, 23, 0.4);
+    }
+    .chat-input {
+      flex: 1;
+      background-color: #020617;
+      color: #f3e8ff;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      padding: 12px 16px;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s ease;
+    }
+    .chat-input:focus {
+      border-color: #10b981;
+    }
+    .chat-input::placeholder {
+      color: rgba(168, 85, 247, 0.4);
+    }
+    .send-btn {
+      padding: 0 24px;
+      background-color: #10b981;
+      color: #020617;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: background 0.2s ease;
+    }
+    .send-btn:hover {
+      background-color: #34d399;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.98); }
       to { opacity: 1; transform: scale(1); }
     }
-    .animate-fade-in {
-      animation: fadeIn 0.3s ease-out forwards;
-    }
   </style>
 </head>
-<body class="galaxy-bg min-h-screen w-full flex items-center justify-center font-sans text-white m-0 overflow-hidden">
+<body>
 
-  <!-- 星雲紫色與藍色光暈特效 -->
-  <div class="absolute inset-0 z-2 bg-[radial-gradient(circle_at_30%_35%,rgba(147,51,234,0.2),transparent_50%)]"></div>
-  <div class="absolute inset-0 z-2 bg-[radial-gradient(circle_at_70%_65%,rgba(59,130,246,0.15),transparent_50%)]"></div>
+  <!-- 光暈背景特效 -->
+  <div class="nebula-1"></div>
+  <div class="nebula-2"></div>
 
-  <!-- 主體互動區容器 -->
-  <div class="relative z-10 w-full max-w-md px-4 flex flex-col items-center justify-center">
+  <!-- 主容器 -->
+  <div class="container">
     
-    <!-- 1. 長方形開始按鈕畫面 -->
-    <div id="start-screen" class="flex flex-col items-center justify-center w-full">
-      <!-- 移除所有圓角(rounded-none)，確保是標準長方形 -->
-      <button id="start-btn" class="w-64 py-4 bg-emerald-500 hover:bg-emerald-400 active:scale-98 text-slate-950 text-xl font-extrabold tracking-widest uppercase transition-all duration-200 border-2 border-emerald-300/30 shadow-[0_0_30px_rgba(16,185,129,0.4)] cursor-pointer">
-        START AI CHAT
-      </button>
+    <!-- 1. 長方形開始畫面 -->
+    <div id="start-screen">
+      <button id="start-btn" class="start-btn">START AI CHAT</button>
     </div>
 
-    <!-- 2. AI 聊天視窗畫面 (預設隱藏) -->
-    <div id="chat-screen" class="hidden w-full h-[550px] bg-slate-900/90 backdrop-blur-xl border border-purple-500/30 flex flex-col shadow-2xl animate-fade-in">
-      
-      <!-- 聊天室頂部資訊 -->
-      <div class="px-6 py-4 border-b border-purple-500/20 flex items-center gap-3 bg-slate-950/40">
-        <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
-        <h2 class="text-purple-300 font-bold tracking-widest text-xs uppercase">Cosmos Intelligence</h2>
+    <!-- 2. AI 聊天室視窗 -->
+    <div id="chat-screen" class="chat-window">
+      <div class="chat-header">
+        <div class="online-indicator"></div>
+        <div class="chat-title">Cosmos Intelligence</div>
       </div>
 
-      <!-- 訊息對話區域 -->
-      <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4 text-left">
-        <!-- AI 初始歡迎訊息 -->
-        <div class="flex justify-start">
-          <div class="max-w-[85%] px-4 py-3 bg-slate-950 border border-purple-900/80 text-purple-100 text-sm leading-relaxed">
+      <div id="chat-messages" class="chat-messages">
+        <div class="message-row row-ai">
+          <div class="bubble bubble-ai">
             系統已連線。傳輸頻道穩定。今天有什麼需要為您解答的星際指令？
           </div>
         </div>
       </div>
 
-      <!-- 輸入框表單 -->
-      <form id="chat-form" class="p-4 border-t border-purple-500/20 flex gap-2 bg-slate-950/40">
-        <input type="text" id="chat-input" placeholder="請輸入訊息..." required autocomplete="off"
-          class="flex-1 bg-slate-950 text-purple-100 placeholder-purple-400/30 px-4 py-3 border border-purple-500/30 focus:outline-none focus:border-emerald-500 transition-colors text-sm" />
-        <button type="submit" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm uppercase tracking-wider transition-colors cursor-pointer">
-          發送
-        </button>
+      <form id="chat-form" class="chat-form">
+        <input type="text" id="chat-input" class="chat-input" placeholder="請輸入訊息..." required autocomplete="off" />
+        <button type="submit" class="send-btn">發送</button>
       </form>
-
     </div>
+
   </div>
 
-  <!-- 前端功能邏輯 JavaScript -->
+  <!-- 功能邏輯 -->
   <script>
     const startScreen = document.getElementById('start-screen');
     const chatScreen = document.getElementById('chat-screen');
@@ -93,44 +259,43 @@
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
 
-    // 點擊長方形按鈕切換到聊天畫面
+    // 切換畫面
     startBtn.addEventListener('click', () => {
       startScreen.style.display = 'none';
       chatScreen.style.display = 'flex';
     });
 
-    // 渲染對話泡泡
-    function appendMessage(text, role) {
-      const wrapper = document.createElement('div');
-      wrapper.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'}`;
-
-      const bubble = document.createElement('div');
-      bubble.className = `max-w-[85%] px-4 py-3 text-sm leading-relaxed ${
-        role === 'user'
-          ? 'bg-purple-700 border border-purple-500/40 text-white'
-          : 'bg-slate-950 border border-purple-900/80 text-purple-100'
-      }`;
-      bubble.textContent = text;
-
-      wrapper.appendChild(bubble);
-      chatMessages.appendChild(wrapper);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    // 表單發送事件
+    // 發送訊息
     chatForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const messageText = chatInput.value.trim();
-      if (!messageText) return;
+      const text = chatInput.value.trim();
+      if (!text) return;
 
-      appendMessage(messageText, 'user');
+      // 使用者訊息
+      const uRow = document.createElement('div');
+      uRow.className = 'message-row row-user';
+      const uBubble = document.createElement('div');
+      uBubble.className = 'bubble bubble-user';
+      uBubble.textContent = text;
+      uRow.appendChild(uBubble);
+      chatMessages.appendChild(uRow);
+
       chatInput.value = '';
+      chatMessages.scrollTop = chatMessages.scrollHeight;
 
       // 模擬 AI 回覆
       setTimeout(() => {
-        appendMessage(`已接收到訊號： "${messageText}"。目前為前端靜態展示，已成功與 Vercel 雲端平台建立部署連接！`, 'ai');
-      }, 800);
+        const aRow = document.createElement('div');
+        aRow.className = 'message-row row-ai';
+        const aBubble = document.createElement('div');
+        aBubble.className = 'bubble bubble-ai';
+        aBubble.textContent = `已接收到訊號： "${text}"。原生內建排版測試成功，完全擺脫跑版問題！`;
+        aRow.appendChild(aBubble);
+        chatMessages.appendChild(aRow);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 700);
     });
   </script>
 </body>
 </html>
+
