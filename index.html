@@ -69,7 +69,7 @@
       { keywords: ["hello", "hi", "hey"], answer: "Hello! Welcome to the interstellar AI system." }
     ];
 
-    startBtn.addEventListener('click', () => {
+    document.getElementById('start-btn').addEventListener('click', () => {
       startScreen.style.display = 'none';
       chatScreen.style.display = 'flex';
     });
@@ -86,13 +86,13 @@
       return bubble;
     }
 
-    async function getSmartResponse(userInput) {
-      // Calls your /api/chat serverless function
+    async function getSmartResponse(prompt) {
+      // Call your deployed API endpoint
       try {
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: userInput })
+          body: JSON.stringify({ prompt: prompt })
         });
         const data = await response.json();
         return data.answer;
@@ -110,13 +110,11 @@
       chatInput.value = '';
 
       if (text.toLowerCase().startsWith("openai-")) {
-        // Remove "OpenAI-" and send the rest to OpenAI
         const prompt = text.substring(7).trim();
         const loadingBubble = appendMessage("Thinking via OpenAI...", "ai");
         const answer = await getSmartResponse(prompt);
         loadingBubble.textContent = answer;
       } else {
-        // Local responses
         const found = knowledgeDatabase.find(item =>
           item.keywords.some(kw => text.toLowerCase().includes(kw))
         );
