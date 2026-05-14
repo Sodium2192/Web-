@@ -228,8 +228,9 @@
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
 
-    // Upgraded Keyword Array mapping for high accuracy
+    // Knowledge Database including your custom "42" response
     const knowledgeDatabase = [
+      { keywords: ["42"], answer: "2,3,7 in the class.those who know" },
       { keywords: ["boss", "leader", "owner"], answer: "sahal is my boss!" },
       { keywords: ["who make", "who made", "creator", "developed", "built this"], answer: "Jacky made it!" },
       { keywords: ["roblox", "ceo", "baszucki"], answer: "The co-founder and current CEO of Roblox is David Baszucki." },
@@ -257,11 +258,10 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // New Smart Fuzzy Search Matching Engine
     function queryKnowledgeBase(input) {
       let cleanInput = input.toLowerCase().trim();
 
-      // 1. Loop through data and test if user text includes ANY of the smart keywords
+      // 1. Check for custom keywords first (including "42")
       for (let item of knowledgeDatabase) {
         let isMatch = item.keywords.some(kw => cleanInput.includes(kw));
         if (isMatch) {
@@ -269,7 +269,7 @@
         }
       }
 
-      // 2. Process General Mathematical Calculations
+      // 2. Math Engine (runs if no keywords are matched)
       let mathExpression = cleanInput.replace(/[^0-9+\-*/().]/g, '');
       if (mathExpression.length > 0 && /[0-9]/.test(mathExpression)) {
         try {
@@ -280,7 +280,7 @@
         } catch (e) {}
       }
 
-      // 3. Fallback Reply
+      // 3. Fallback
       return `Cosmos Database Update: I've logged your request: "${input}". Let Jacky know if you want to add a unique answer configuration for this text phrase!`;
     }
 
