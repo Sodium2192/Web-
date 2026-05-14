@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Galaxy AI Chat Engine</title>
   <style>
-    /* Global Clean Slate layout */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -13,7 +12,6 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    /* Full-Screen Purple Galaxy Gradient Background */
     body {
       background: radial-gradient(ellipse at bottom, #0f172a 0%, #020617 100%);
       min-height: 100vh;
@@ -26,7 +24,6 @@
       position: relative;
     }
 
-    /* Twinkling Starfield System Layer */
     body::before {
       content: "";
       position: absolute;
@@ -42,7 +39,6 @@
       z-index: 1;
     }
 
-    /* Violet Cosmic Nebula Core Clouds */
     .nebula-1 {
       position: absolute;
       inset: 0;
@@ -56,7 +52,6 @@
       z-index: 2;
     }
 
-    /* App Core Alignment Shell */
     .container {
       position: relative;
       z-index: 10;
@@ -69,7 +64,6 @@
       justify-content: center;
     }
 
-    /* Sharp Solid Rectangle Green Start Button */
     .start-btn {
       width: 260px;
       padding: 16px 0;
@@ -91,7 +85,6 @@
     }
     .start-btn:active { transform: scale(0.97); }
 
-    /* Main Chat Interface Screen Frame */
     .chat-window {
       display: none;
       width: 100%;
@@ -126,7 +119,6 @@
       text-transform: uppercase;
     }
 
-    /* Message Stream Window */
     .chat-messages {
       flex: 1;
       overflow-y: auto;
@@ -159,7 +151,6 @@
       color: #ffffff;
     }
 
-    /* Chat Footer Layout */
     .chat-form {
       padding: 16px;
       border-top: 1px solid rgba(168, 85, 247, 0.2);
@@ -237,17 +228,17 @@
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
 
-    // Built-in Complete Encyclopedia and Custom Commands
+    // Upgraded Keyword Array mapping for high accuracy
     const knowledgeDatabase = [
-      { keywords: ["boss"], answer: "Jacky is my boss!" },
-      { keywords: ["who make", "who made", "creator"], answer: "Jacky made it!" },
-      { keywords: ["roblox", "ceo"], answer: "The co-founder and current CEO of Roblox is David Baszucki." },
-      { keywords: ["distance", "mars", "earth"], answer: "Currently, Mars is approximately 332 million kilometers (206 million miles) away from Earth." },
-      { keywords: ["speed of light"], answer: "The speed of light is 299,792 kilometers per second (about 186,282 miles per second)." },
+      { keywords: ["boss", "leader", "owner"], answer: "Jacky is my boss!" },
+      { keywords: ["who make", "who made", "creator", "developed", "built this"], answer: "Jacky made it!" },
+      { keywords: ["roblox", "ceo", "baszucki"], answer: "The co-founder and current CEO of Roblox is David Baszucki." },
+      { keywords: ["mars", "earth", "distance"], answer: "Currently, Mars is approximately 332 million kilometers (206 million miles) away from Earth." },
+      { keywords: ["light", "speed"], answer: "The speed of light is 299,792 kilometers per second (about 186,282 miles per second)." },
       { keywords: ["hello", "hi", "hey"], answer: "Hello! Welcome to the interstellar AI system. How can I assist you today?" },
-      { keywords: ["who are you"], answer: "I am Cosmos Intelligence, an automated smart assistant running live on Vercel." },
-      { keywords: ["apple", "ceo"], answer: "The current CEO of Apple is Tim Cook." },
-      { keywords: ["tesla", "musk"], answer: "The CEO of Tesla and SpaceX is Elon Musk." }
+      { keywords: ["who are you", "your name"], answer: "I am Cosmos Intelligence, an automated smart assistant running live on Vercel." },
+      { keywords: ["apple", "ceo", "cook"], answer: "The current CEO of Apple is Tim Cook." },
+      { keywords: ["tesla", "musk", "spacex"], answer: "The CEO of Tesla and SpaceX is Elon Musk." }
     ];
 
     startBtn.addEventListener('click', () => {
@@ -266,13 +257,14 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Engine Core matching algorithms
+    // New Smart Fuzzy Search Matching Engine
     function queryKnowledgeBase(input) {
       let cleanInput = input.toLowerCase().trim();
 
-      // 1. Process Encyclopedia Matches
+      // 1. Loop through data and test if user text includes ANY of the smart keywords
       for (let item of knowledgeDatabase) {
-        if (item.keywords.every(kw => cleanInput.includes(kw))) {
+        let isMatch = item.keywords.some(kw => cleanInput.includes(kw));
+        if (isMatch) {
           return item.answer;
         }
       }
@@ -288,8 +280,8 @@
         } catch (e) {}
       }
 
-      // 3. Smart General fallback reply 
-      return `Cosmos Database Update: I've logged your request: "${input}". I am processing this transmission. Let me know if you want to configure specific answers for this phrase!`;
+      // 3. Fallback Reply
+      return `Cosmos Database Update: I've logged your request: "${input}". Let Jacky know if you want to add a unique answer configuration for this text phrase!`;
     }
 
     chatForm.addEventListener('submit', (e) => {
@@ -300,11 +292,10 @@
       appendMessage(text, 'user');
       chatInput.value = '';
 
-      // AI Response with realistic processing delay
       setTimeout(() => {
         const answer = queryKnowledgeBase(text);
         appendMessage(answer, 'ai');
-      }, 500);
+      }, 450);
     });
   </script>
 </body>
