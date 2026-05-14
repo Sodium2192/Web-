@@ -125,10 +125,10 @@
     .key-input {
       width: 100%;
       background: #020617;
-      border: 1px solid rgba(168, 85, 247, 0.4);
+      border: 2px solid #e11d48; /* 改為紅色邊框，更顯眼 */
       color: #10b981;
-      font-size: 11px;
-      padding: 6px 10px;
+      font-size: 12px;
+      padding: 8px 10px;
       outline: none;
     }
 
@@ -215,20 +215,20 @@
           <div class="online-indicator"></div>
           <div class="chat-title">Cosmos Intelligence (OpenAI Engine)</div>
         </div>
-        <!-- Input field where you or your users insert the OpenAI API token safely -->
-        <input type="password" id="api-key-input" class="key-input" placeholder="Paste OpenAI API Key (sk-...) here to use live intelligence" />
+        <!-- 上方金鑰格：加強紅色框與說明 -->
+        <input type="password" id="api-key-input" class="key-input" placeholder="🔴 PASTE YOUR API KEY HERE (sk-...)" />
       </div>
 
       <div id="chat-messages" class="chat-messages">
         <div class="message-row row-ai">
           <div class="bubble bubble-ai">
-            System Online. Custom commands configured. Type any custom statement or paste your OpenAI key above to unlock full smart answers!
+            System Online. Custom commands active. Paste your key into the RED BOX above. Then type your questions here!
           </div>
         </div>
       </div>
 
       <form id="chat-form" class="chat-form">
-        <input type="text" id="chat-input" class="chat-input" placeholder="Type your message..." required autocomplete="off" />
+        <input type="text" id="chat-input" class="chat-input" placeholder="Type your question here..." required autocomplete="off" />
         <button type="submit" class="send-btn">Send</button>
       </form>
     </div>
@@ -243,20 +243,10 @@
     const chatMessages = document.getElementById('chat-messages');
     const apiKeyInput = document.getElementById('api-key-input');
 
-    // Custom commands that overwrite standard OpenAI completions
     const customDatabase = [
-      {
-        keywords: ["boss", "your boss", "ur boss"],
-        answer: "Jacky is my boss!"
-      },
-      {
-        keywords: ["who make", "who made", "creator"],
-        answer: "Jacky made it!"
-      },
-      {
-        keywords: ["roblox", "ceo"],
-        answer: "The CEO of Roblox is David Baszucki."
-      }
+      { keywords: ["boss", "your boss", "ur boss"], answer: "Jacky is my boss!" },
+      { keywords: ["who make", "who made", "creator"], answer: "Jacky made it!" },
+      { keywords: ["roblox", "ceo"], answer: "The CEO of Roblox is David Baszucki." }
     ];
 
     startBtn.addEventListener('click', () => {
@@ -275,7 +265,6 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Call live OpenAI API Endpoint securely from frontend client 
     async function getOpenAiResponse(userText, apiKey) {
       try {
         const response = await fetch('openai.com', {
@@ -292,11 +281,11 @@
 
         const data = await response.json();
         if (data.choices && data.choices[0]) {
-          return data.choices[0].messages.content;
+          return data.choices[0].message.content;
         } else if (data.error) {
           return `OpenAI Error: ${data.error.message}`;
         }
-        return "No response received from cloud servers.";
+        return "No response received from OpenAI cloud servers.";
       } catch (err) {
         return "Failed to connect to OpenAI cloud network.";
       }
@@ -304,8 +293,18 @@
 
     chatForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const text = chatInput.value.trim();
+      let text = chatInput.value.trim();
       if (!text) return;
+
+      // 防呆優化：如果使用者在對話框不小心加上了 "sk-"，自動幫他過濾掉
+      if (text.toLowerCase().startsWith('sk-') && text.length > 30) {
+        appendMessage("System detected: You pasted the API key into the wrong box. Please paste it into the RED box at the top instead!", 'ai');
+        chatInput.value = '';
+        return;
+      }
+      if (text.toLowerCase().startsWith('sk- ')) {
+        text = text.substring(4);
+      }
 
       appendMessage(text, 'user');
       chatInput.value = '';
@@ -313,7 +312,7 @@
       let cleanInput = text.toLowerCase();
       let foundCustomAnswer = null;
 
-      // 1. Check custom override conditions first
+      // 1. 檢查自訂指令
       for (let item of customDatabase) {
         if (item.keywords.some(keyword => cleanInput.includes(keyword))) {
           foundCustomAnswer = item.answer;
@@ -326,7 +325,7 @@
         return;
       }
 
-      // 2. Fallback to basic arithmetic calculations
+      // 2. 檢查數學題
       let mathExpression = cleanInput.replace(/[^0-9+\-*/().]/g, '');
       if (mathExpression.length > 0 && /[0-9]/.test(mathExpression)) {
         try {
@@ -338,18 +337,17 @@
         } catch (e) {}
       }
 
-      // 3. Fallback to Live OpenAI Endpoint if key is present
+      // 3. 呼叫 OpenAI API
       const apiKey = apiKeyInput.value.trim();
       if (apiKey.startsWith('sk-')) {
         appendMessage("Connecting to Cosmos core network...", "ai");
         const aiAnswer = await getOpenAiResponse(text, apiKey);
         
-        // Remove the temporary loading status and add the real answer
-        chatMessages.lastElementChild.remove();
+        chatMessages.lastElementChild.remove(); // 移除載入中字樣
         appendMessage(aiAnswer, 'ai');
       } else {
         setTimeout(() => {
-          appendMessage(`Received signal: "${text}". To fetch smart cloud answers for this question, please paste your OpenAI API key into the input field at the top.`, 'ai');
+          appendMessage(`Received signal: "${text}".\nTo answer this question via OpenAI cloud, please paste your secret API Key into the RED input box at the very top.`, 'ai');
         }, 500);
       }
     });
