@@ -81,16 +81,16 @@
       overflow: hidden;
     }
 
-    /* Fixed Chat Header Layout */
+    /* Fixed Header with Absolute Containment */
     .chat-header {
       padding: 16px 20px;
       border-bottom: 1px solid rgba(168, 85, 247, 0.2);
       display: flex;
       align-items: center;
-      justify-content: space-between;
       background-color: rgba(2, 6, 23, 0.8);
       position: relative;
       z-index: 10;
+      height: 60px;
     }
     
     .header-left {
@@ -114,35 +114,39 @@
       text-transform: uppercase;
     }
 
-    /* 3 Lines Hamburger Menu Icon Style Fixes */
+    /* Force button to the top-right corner explicitly */
     .menu-btn {
+      position: absolute !important;
+      right: 15px !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
       background: transparent !important;
       border: none !important;
-      cursor: pointer;
+      cursor: pointer !important;
       display: flex !important;
       flex-direction: column !important;
-      justify-content: center;
-      align-items: center;
       gap: 4px !important;
-      width: 32px !important;
-      height: 32px !important;
+      width: 30px !important;
+      height: 24px !important;
+      justify-content: center !important;
+      align-items: center !important;
       padding: 0 !important;
-      outline: none;
+      z-index: 99999 !important;
     }
     
     .menu-btn span {
       display: block !important;
       width: 22px !important;
       height: 2px !important;
-      background-color: #10b981 !important; /* Green bars to stand out cleanly */
+      background-color: #10b981 !important; /* Bright green lines so you can't miss them */
       transition: all 0.2s ease;
     }
-    
+
     .menu-btn:hover span {
-      background-color: #d8b4fe !important;
+      background-color: #ffffff !important;
     }
 
-    /* Fixed Sliding Sidebar Container Overlay */
+    /* Full Window Sidebar Overlay */
     .sidebar {
       position: absolute;
       top: 0;
@@ -151,7 +155,7 @@
       height: 100%;
       background-color: #090d16;
       border-left: 1px solid rgba(168, 85, 247, 0.3);
-      z-index: 9999; /* Force it on top of messages */
+      z-index: 999999;
       transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       flex-direction: column;
@@ -322,7 +326,7 @@
       </div>
 
       <div class="suggestion-container">
-        <button class="suggest-btn" onclick="askQuestion('database')">Global DB</button>
+        <button class="suggest-btn" onclick="askQuestion('database')">Show Database</button>
         <button class="suggest-btn" onclick="askQuestion('paddy')">Paddy</button>
         <button class="suggest-btn" onclick="askQuestion('marcus')">Marcus</button>
         <button class="suggest-btn" onclick="askQuestion('boss')">Boss Info</button>
@@ -336,7 +340,7 @@
   </div>
 
   <script>
-    // Free backend sync database endpoint URL
+    // Free cloud storage data bucket node endpoint
     const PUBLIC_API_URL = "https://kvdb.io/MN87XgS3G4V9wRshX4qS7Q/classmates_db";
 
     const startScreen = document.getElementById('start-screen');
@@ -370,7 +374,7 @@
           customDatabase = await response.json();
         }
       } catch (e) {
-        console.log("Database initialized empty.");
+        console.log("Database fetch skip.");
       }
     }
 
@@ -385,17 +389,19 @@
       }
     }
 
-    // Call sync on page boot
+    // Load cloud snapshot data instantly on container initialize
     pullSharedDatabase();
 
-    // Menu Open/Close logic triggers
+    // Force Open Event Listeners
     menuBtn.addEventListener('click', function(e) {
       e.preventDefault();
+      e.stopPropagation();
       sidebar.classList.add('open');
     });
 
     closeBtn.addEventListener('click', function(e) {
       e.preventDefault();
+      e.stopPropagation();
       sidebar.classList.remove('open');
     });
 
