@@ -39,19 +39,6 @@
       z-index: 1;
     }
 
-    .nebula-1 {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 30% 35%, rgba(147, 51, 234, 0.25), transparent 60%);
-      z-index: 2;
-    }
-    .nebula-2 {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 70% 65%, rgba(59, 130, 246, 0.18), transparent 60%);
-      z-index: 2;
-    }
-
     .container {
       position: relative;
       z-index: 10;
@@ -94,19 +81,22 @@
       overflow: hidden;
     }
 
+    /* Fixed Chat Header Layout */
     .chat-header {
-      padding: 16px 24px;
+      padding: 16px 20px;
       border-bottom: 1px solid rgba(168, 85, 247, 0.2);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background-color: rgba(2, 6, 23, 0.4);
+      background-color: rgba(2, 6, 23, 0.8);
+      position: relative;
+      z-index: 10;
     }
     
     .header-left {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .online-indicator {
@@ -115,35 +105,44 @@
       background-color: #10b981;
       border-radius: 50%;
     }
+    
     .chat-title {
       color: #d8b4fe;
       font-size: 13px;
       font-weight: 700;
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
     }
 
+    /* 3 Lines Hamburger Menu Icon Style Fixes */
     .menu-btn {
-      background: none;
-      border: none;
+      background: transparent !important;
+      border: none !important;
       cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      padding: 8px;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center;
+      align-items: center;
+      gap: 4px !important;
+      width: 32px !important;
+      height: 32px !important;
+      padding: 0 !important;
+      outline: none;
     }
+    
     .menu-btn span {
-      display: block;
-      width: 22px;
-      height: 2px;
-      background-color: #d8b4fe;
-      transition: 0.2s;
+      display: block !important;
+      width: 22px !important;
+      height: 2px !important;
+      background-color: #10b981 !important; /* Green bars to stand out cleanly */
+      transition: all 0.2s ease;
     }
+    
     .menu-btn:hover span {
-      background-color: #10b981;
+      background-color: #d8b4fe !important;
     }
 
-    /* Sidebar Panel Fixed to Container Internal Layout Box */
+    /* Fixed Sliding Sidebar Container Overlay */
     .sidebar {
       position: absolute;
       top: 0;
@@ -152,15 +151,17 @@
       height: 100%;
       background-color: #090d16;
       border-left: 1px solid rgba(168, 85, 247, 0.3);
-      z-index: 100;
+      z-index: 9999; /* Force it on top of messages */
       transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       flex-direction: column;
       padding: 16px;
     }
+    
     .sidebar.open {
-      right: 0;
+      right: 0 !important;
     }
+    
     .sidebar-header {
       display: flex;
       justify-content: space-between;
@@ -169,6 +170,7 @@
       border-bottom: 1px solid rgba(168, 85, 247, 0.2);
       padding-bottom: 10px;
     }
+    
     .close-btn {
       background: none;
       border: none;
@@ -177,9 +179,6 @@
       font-size: 14px;
       cursor: pointer;
     }
-    .close-btn:hover {
-      color: #f87171;
-    }
 
     .game-container {
       flex: 1;
@@ -187,6 +186,7 @@
       background: #000;
       border: 1px solid rgba(168, 85, 247, 0.2);
     }
+    
     .game-frame {
       width: 100%;
       height: 100%;
@@ -224,12 +224,6 @@
       font-weight: 600;
       text-transform: uppercase;
       cursor: pointer;
-      white-space: nowrap;
-    }
-    .suggest-btn:hover {
-      background: rgba(16, 185, 129, 0.2);
-      border-color: #10b981;
-      color: #ffffff;
     }
 
     .message-row { display: flex; width: 100%; }
@@ -262,6 +256,7 @@
       gap: 10px;
       background-color: rgba(2, 6, 23, 0.4);
     }
+    
     .chat-input {
       flex: 1;
       background-color: #020617;
@@ -289,9 +284,6 @@
 </head>
 <body>
 
-  <div class="nebula-1"></div>
-  <div class="nebula-2"></div>
-
   <div class="container">
     <div id="start-screen">
       <button id="start-btn" class="start-btn">START AI CHAT</button>
@@ -301,7 +293,7 @@
       <div class="chat-header">
         <div class="header-left">
           <div class="online-indicator"></div>
-          <div class="chat-title">Cosmos Intelligence Engine</div>
+          <div class="chat-title">Cosmos Engine</div>
         </div>
         <button class="menu-btn" id="menu-btn" type="button">
           <span></span>
@@ -344,7 +336,7 @@
   </div>
 
   <script>
-    // A secure, zero-config unique bucket url for your exact class app sync
+    // Free backend sync database endpoint URL
     const PUBLIC_API_URL = "https://kvdb.io/MN87XgS3G4V9wRshX4qS7Q/classmates_db";
 
     const startScreen = document.getElementById('start-screen');
@@ -358,7 +350,6 @@
     const menuBtn = document.getElementById('menu-btn');
     const closeBtn = document.getElementById('close-btn');
 
-    // Hardcoded permanent entries
     const defaultDatabase = [
       { 
         keywords: ["paddy", "2d23"], 
@@ -372,7 +363,6 @@
 
     let customDatabase = [];
 
-    // Fetch entries added by other users across the internet
     async function pullSharedDatabase() {
       try {
         let response = await fetch(PUBLIC_API_URL);
@@ -380,11 +370,10 @@
           customDatabase = await response.json();
         }
       } catch (e) {
-        console.log("Database initialized or empty.");
+        console.log("Database initialized empty.");
       }
     }
 
-    // Push new elements over the web instantly
     async function pushSharedDatabase(newDataArray) {
       try {
         await fetch(PUBLIC_API_URL, {
@@ -396,15 +385,17 @@
       }
     }
 
-    // Load initial online database records right away
+    // Call sync on page boot
     pullSharedDatabase();
 
-    // Menu Controls
-    menuBtn.addEventListener('click', function() {
+    // Menu Open/Close logic triggers
+    menuBtn.addEventListener('click', function(e) {
+      e.preventDefault();
       sidebar.classList.add('open');
     });
 
-    closeBtn.addEventListener('click', function() {
+    closeBtn.addEventListener('click', function(e) {
+      e.preventDefault();
       sidebar.classList.remove('open');
     });
 
@@ -432,20 +423,18 @@
       if (!text) return;
       appendMessage(text, 'user');
 
-      // Refresh database records continuously on query requests
       await pullSharedDatabase();
 
       setTimeout(async () => {
         let cleanInput = text.toLowerCase().trim();
         let response = "Sector scan complete. No database match found.";
 
-        // --- GLOBAL SAVE METHOD (-CM) ---
         if (cleanInput.startsWith("-cm")) {
           const entry = text.substring(3).trim(); 
           const firstWord = entry.split(" ")[0].toLowerCase(); 
           
           if(!firstWord) {
-             appendMessage("Error: Missing profile descriptor variables behind -CM command tag.", 'ai');
+             appendMessage("Error: Missing parameters behind -CM command tag.", 'ai');
              return;
           }
 
@@ -457,7 +446,7 @@
           customDatabase.push(newEntry);
           await pushSharedDatabase(customDatabase);
           
-          response = `Data verified. Profile "${firstWord}" has been synced to the global server box for all users.`;
+          response = `Data verified. Profile "${firstWord}" has been synced to the server for everyone.`;
           appendMessage(response, 'ai');
           return;
         }
@@ -465,7 +454,7 @@
         const absoluteDatabase = [...defaultDatabase, ...customDatabase];
 
         if (cleanInput === "database" || cleanInput === "show database" || cleanInput === "global db") {
-            response = "🌐 Shared Network Storage Output Records:\n\n" + absoluteDatabase.map(i => i.answer).join("\n\n---\n\n");
+            response = "🌐 Shared Network Storage Records:\n\n" + absoluteDatabase.map(i => i.answer).join("\n\n---\n\n");
             appendMessage(response, 'ai');
             return;
         }
@@ -482,7 +471,7 @@
         if (!found) {
           if (cleanInput.includes("boss")) response = "Sahal is the boss!";
           else if (cleanInput.includes("jacky")) response = "Jacky engineered this build.";
-          else if (cleanInput.includes("hello") || cleanInput.includes("hi")) response = "Greetings user. Engine environment healthy.";
+          else if (cleanInput.includes("hello") || cleanInput.includes("hi")) response = "Greetings user.";
         }
 
         appendMessage(response, 'ai');
