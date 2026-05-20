@@ -90,6 +90,7 @@
       flex-direction: column;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
       animation: fadeIn 0.35s ease-out forwards;
+      position: relative;
     }
 
     .chat-header {
@@ -97,9 +98,16 @@
       border-bottom: 1px solid rgba(168, 85, 247, 0.2);
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
       background-color: rgba(2, 6, 23, 0.4);
     }
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
     .online-indicator {
       width: 10px;
       height: 10px;
@@ -112,6 +120,74 @@
       font-weight: 700;
       letter-spacing: 2px;
       text-transform: uppercase;
+    }
+
+    /* 3 Lines Menu Button */
+    .menu-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 4px;
+    }
+    .menu-btn span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background-color: #d8b4fe;
+      transition: 0.2s;
+    }
+    .menu-btn:hover span {
+      background-color: #10b981;
+    }
+
+    /* Sidebar Panel */
+    .sidebar {
+      position: absolute;
+      top: 0;
+      right: -100%;
+      width: 85%;
+      height: 100%;
+      background-color: #090d16;
+      border-left: 1px solid rgba(168, 85, 247, 0.3);
+      z-index: 100;
+      transition: right 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+    }
+    .sidebar.open {
+      right: 0;
+    }
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+      padding-bottom: 10px;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      color: #10b981;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Wordle Frame */
+    .game-container {
+      flex: 1;
+      width: 100%;
+      background: #000;
+      border: 1px solid rgba(168, 85, 247, 0.2);
+    }
+    .game-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
     }
 
     .chat-messages {
@@ -206,7 +282,7 @@
 <body>
 
   <div class="nebula-1"></div>
-  <div class="nebula-2 :"></div>
+  <div class="nebula-2"></div>
 
   <div class="container">
     <div id="start-screen">
@@ -215,28 +291,45 @@
 
     <div id="chat-screen" class="chat-window">
       <div class="chat-header">
-        <div class="online-indicator"></div>
-        <div class="chat-title">Cosmos Intelligence Engine</div>
+        <div class="header-left">
+          <div class="online-indicator"></div>
+          <div class="chat-title">Cosmos Intelligence Engine</div>
+        </div>
+        <button class="menu-btn" id="menu-btn" title="Open Arcade">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <span style="font-size: 12px; font-weight: bold; color: #d8b4fe; letter-spacing: 1px;">COSMOS ARCADE</span>
+          <button class="close-btn" id="close-btn">CLOSE ✕</button>
+        </div>
+        <div class="game-container">
+          <iframe class="game-frame" src="https://www.nytimes.com/games/wordle/index.html"></iframe>
+        </div>
       </div>
 
       <div id="chat-messages" class="chat-messages">
         <div class="message-row row-ai">
           <div class="bubble bubble-ai">
             System Online. 
-            To add a person, use: **-CM Name Info**
+            🔒 Local Encrypted Session Active. Add profiles using **-CM [Data]**. Data is private to this device.
           </div>
         </div>
       </div>
 
       <div class="suggestion-container">
-        <button class="suggest-btn" onclick="askQuestion('database')">Show Database</button>
+        <button class="suggest-btn" onclick="askQuestion('database')">My Local DB</button>
         <button class="suggest-btn" onclick="askQuestion('paddy')">Paddy</button>
         <button class="suggest-btn" onclick="askQuestion('marcus')">Marcus</button>
         <button class="suggest-btn" onclick="askQuestion('boss')">Boss Info</button>
       </div>
 
       <form id="chat-form" class="chat-form">
-        <input type="text" id="chat-input" class="chat-input" placeholder="Ask or use -CM to add..." required autocomplete="off" />
+        <input type="text" id="chat-input" class="chat-input" placeholder="Ask or use -CM to add privately..." required autocomplete="off" />
         <button type="submit" class="send-btn">Send</button>
       </form>
     </div>
@@ -249,9 +342,14 @@
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
+    
+    // Sidebar Elements
+    const sidebar = document.getElementById('sidebar');
+    const menuBtn = document.getElementById('menu-btn');
+    const closeBtn = document.getElementById('close-btn');
 
-    // Initial Database
-    let knowledgeDatabase = [
+    // Default Static Hardcoded Database Records
+    const defaultDatabase = [
       { 
         keywords: ["paddy", "2d23"], 
         answer: "2D 23(麥栢林paddy)\nHobby: gooning, date with girls.\nFavourite subject: English\nCrush: 2, 3, 7, 11" 
@@ -261,6 +359,10 @@
         answer: "2D18(朱程諾marcus)\nHobby: attention seeking.\nFavourite subject: CHINESE HISTORY\nCrush: 2, 3, 14" 
       }
     ];
+
+    // Sidebar Interactive Logic
+    menuBtn.addEventListener('click', () => sidebar.classList.add('open'));
+    closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
 
     startBtn.addEventListener('click', () => {
       startScreen.style.display = 'none';
@@ -282,47 +384,70 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
+    // Helper to retrieve private user-created entries stored strictly inside browser hardware
+    function getPrivateDatabase() {
+      const stored = localStorage.getItem('private_classmates');
+      return stored ? JSON.parse(stored) : [];
+    }
+
     function handleChat(text) {
       if (!text) return;
       appendMessage(text, 'user');
 
       setTimeout(() => {
         let cleanInput = text.toLowerCase().trim();
-        let response = "Sector scan complete. No data found.";
+        let response = "Sector scan complete. No localized data match found.";
 
-        // --- NEW FEATURE: ADD CLASSMATE COMMAND ---
+        // --- PRIVATE LOCAL STORAGE ADD FUNCTIONION (-CM) ---
         if (cleanInput.startsWith("-cm")) {
-          const entry = text.substring(3).trim(); // Remove "-CM"
-          const firstWord = entry.split(" ")[0].toLowerCase(); // Use first word as keyword
+          const entry = text.substring(3).trim(); 
+          const firstWord = entry.split(" ")[0].toLowerCase(); 
           
-          knowledgeDatabase.push({
+          if(!firstWord) {
+             appendMessage("Error: Please supply structural context after -CM parameter.", 'ai');
+             return;
+          }
+
+          let currentPrivateDB = getPrivateDatabase();
+          currentPrivateDB.push({
             keywords: [firstWord],
-            answer: `📂 NEW DATA LOGGED:\n\n${entry}`
+            answer: `📂 LOCAL ENTRY (Private to you):\n\n${entry}`
           });
           
-          response = `Target "${firstWord}" has been uploaded to the local database.`;
+          // Writes values to local client sandbox. This data never touches a public network server.
+          localStorage.setItem('private_classmates', JSON.stringify(currentPrivateDB));
+          
+          response = `Target database sector verified. Entry "${firstWord}" locked exclusively into your local terminal environment.`;
           appendMessage(response, 'ai');
           return;
         }
 
-        // --- SHOW DATABASE COMMAND ---
-        if (cleanInput === "database" || cleanInput === "show database") {
-            response = "Current Records:\n\n" + knowledgeDatabase.map(i => i.answer).join("\n\n---\n\n");
+        // Combine system base arrays alongside the client's localized variables
+        const activePrivateDB = getPrivateDatabase();
+        const absoluteDatabase = [...defaultDatabase, ...activePrivateDB];
+
+        // --- COMBINED MASTER DATABASE INQUIRY ---
+        if (cleanInput === "database" || cleanInput === "show database" || cleanInput === "my local db") {
+            response = "⚡ System Dynamic Engine Records:\n\n" + absoluteDatabase.map(i => i.answer).join("\n\n---\n\n");
             appendMessage(response, 'ai');
             return;
         }
 
-        // --- NORMAL SEARCH ---
-        for (let item of knowledgeDatabase) {
+        // --- SCAN COMBINED DATA ---
+        let found = false;
+        for (let item of absoluteDatabase) {
           if (item.keywords.some(kw => cleanInput.includes(kw))) {
             response = item.answer;
+            found = true;
             break;
           }
         }
         
-        // Default responses for boss/creator
-        if (cleanInput.includes("boss")) response = "Sahal is the boss!";
-        if (cleanInput.includes("jacky")) response = "Jacky is the creator.";
+        if (!found) {
+          if (cleanInput.includes("boss")) response = "Sahal is the boss!";
+          else if (cleanInput.includes("jacky")) response = "Jacky engineered this build.";
+          else if (cleanInput.includes("hello") || cleanInput.includes("hi")) response = "Greetings user. Interface optimal.";
+        }
 
         appendMessage(response, 'ai');
       }, 450);
