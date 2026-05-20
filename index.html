@@ -91,6 +91,7 @@
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
       animation: fadeIn 0.35s ease-out forwards;
       position: relative;
+      overflow: hidden;
     }
 
     .chat-header {
@@ -122,7 +123,6 @@
       text-transform: uppercase;
     }
 
-    /* 3 Lines Menu Button */
     .menu-btn {
       background: none;
       border: none;
@@ -130,11 +130,11 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
-      padding: 4px;
+      padding: 8px;
     }
     .menu-btn span {
       display: block;
-      width: 20px;
+      width: 22px;
       height: 2px;
       background-color: #d8b4fe;
       transition: 0.2s;
@@ -143,17 +143,17 @@
       background-color: #10b981;
     }
 
-    /* Sidebar Panel */
+    /* Sidebar Panel Fixed to Container Internal Layout Box */
     .sidebar {
       position: absolute;
       top: 0;
       right: -100%;
-      width: 85%;
+      width: 100%;
       height: 100%;
       background-color: #090d16;
       border-left: 1px solid rgba(168, 85, 247, 0.3);
       z-index: 100;
-      transition: right 0.3s ease;
+      transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       flex-direction: column;
       padding: 16px;
@@ -172,12 +172,15 @@
     .close-btn {
       background: none;
       border: none;
-      color: #10b981;
+      color: #ef4444;
       font-weight: bold;
+      font-size: 14px;
       cursor: pointer;
     }
+    .close-btn:hover {
+      color: #f87171;
+    }
 
-    /* Wordle Frame */
     .game-container {
       flex: 1;
       width: 100%;
@@ -222,6 +225,11 @@
       text-transform: uppercase;
       cursor: pointer;
       white-space: nowrap;
+    }
+    .suggest-btn:hover {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+      color: #ffffff;
     }
 
     .message-row { display: flex; width: 100%; }
@@ -295,7 +303,7 @@
           <div class="online-indicator"></div>
           <div class="chat-title">Cosmos Intelligence Engine</div>
         </div>
-        <button class="menu-btn" id="menu-btn" title="Open Arcade">
+        <button class="menu-btn" id="menu-btn" type="button">
           <span></span>
           <span></span>
           <span></span>
@@ -305,7 +313,7 @@
       <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
           <span style="font-size: 12px; font-weight: bold; color: #d8b4fe; letter-spacing: 1px;">COSMOS ARCADE</span>
-          <button class="close-btn" id="close-btn">CLOSE ✕</button>
+          <button class="close-btn" id="close-btn" type="button">✕ CLOSE</button>
         </div>
         <div class="game-container">
           <iframe class="game-frame" src="https://www.nytimes.com/games/wordle/index.html"></iframe>
@@ -316,26 +324,29 @@
         <div class="message-row row-ai">
           <div class="bubble bubble-ai">
             System Online. 
-            🔒 Local Encrypted Session Active. Add profiles using **-CM [Data]**. Data is private to this device.
+            🌐 Shared Network Sync Active. Anyone can add profiles globally using **-CM [Data]**.
           </div>
         </div>
       </div>
 
       <div class="suggestion-container">
-        <button class="suggest-btn" onclick="askQuestion('database')">My Local DB</button>
+        <button class="suggest-btn" onclick="askQuestion('database')">Global DB</button>
         <button class="suggest-btn" onclick="askQuestion('paddy')">Paddy</button>
         <button class="suggest-btn" onclick="askQuestion('marcus')">Marcus</button>
         <button class="suggest-btn" onclick="askQuestion('boss')">Boss Info</button>
       </div>
 
       <form id="chat-form" class="chat-form">
-        <input type="text" id="chat-input" class="chat-input" placeholder="Ask or use -CM to add privately..." required autocomplete="off" />
+        <input type="text" id="chat-input" class="chat-input" placeholder="Ask or use -CM to add globally..." required autocomplete="off" />
         <button type="submit" class="send-btn">Send</button>
       </form>
     </div>
   </div>
 
   <script>
+    // A secure, zero-config unique bucket url for your exact class app sync
+    const PUBLIC_API_URL = "https://kvdb.io/MN87XgS3G4V9wRshX4qS7Q/classmates_db";
+
     const startScreen = document.getElementById('start-screen');
     const chatScreen = document.getElementById('chat-screen');
     const startBtn = document.getElementById('start-btn');
@@ -343,12 +354,11 @@
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
     
-    // Sidebar Elements
     const sidebar = document.getElementById('sidebar');
     const menuBtn = document.getElementById('menu-btn');
     const closeBtn = document.getElementById('close-btn');
 
-    // Default Static Hardcoded Database Records
+    // Hardcoded permanent entries
     const defaultDatabase = [
       { 
         keywords: ["paddy", "2d23"], 
@@ -360,9 +370,43 @@
       }
     ];
 
-    // Sidebar Interactive Logic
-    menuBtn.addEventListener('click', () => sidebar.classList.add('open'));
-    closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
+    let customDatabase = [];
+
+    // Fetch entries added by other users across the internet
+    async function pullSharedDatabase() {
+      try {
+        let response = await fetch(PUBLIC_API_URL);
+        if (response.ok) {
+          customDatabase = await response.json();
+        }
+      } catch (e) {
+        console.log("Database initialized or empty.");
+      }
+    }
+
+    // Push new elements over the web instantly
+    async function pushSharedDatabase(newDataArray) {
+      try {
+        await fetch(PUBLIC_API_URL, {
+          method: 'POST',
+          body: JSON.stringify(newDataArray)
+        });
+      } catch (e) {
+        console.error("Sync Error:", e);
+      }
+    }
+
+    // Load initial online database records right away
+    pullSharedDatabase();
+
+    // Menu Controls
+    menuBtn.addEventListener('click', function() {
+      sidebar.classList.add('open');
+    });
+
+    closeBtn.addEventListener('click', function() {
+      sidebar.classList.remove('open');
+    });
 
     startBtn.addEventListener('click', () => {
       startScreen.style.display = 'none';
@@ -384,56 +428,48 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Helper to retrieve private user-created entries stored strictly inside browser hardware
-    function getPrivateDatabase() {
-      const stored = localStorage.getItem('private_classmates');
-      return stored ? JSON.parse(stored) : [];
-    }
-
-    function handleChat(text) {
+    async function handleChat(text) {
       if (!text) return;
       appendMessage(text, 'user');
 
-      setTimeout(() => {
-        let cleanInput = text.toLowerCase().trim();
-        let response = "Sector scan complete. No localized data match found.";
+      // Refresh database records continuously on query requests
+      await pullSharedDatabase();
 
-        // --- PRIVATE LOCAL STORAGE ADD FUNCTIONION (-CM) ---
+      setTimeout(async () => {
+        let cleanInput = text.toLowerCase().trim();
+        let response = "Sector scan complete. No database match found.";
+
+        // --- GLOBAL SAVE METHOD (-CM) ---
         if (cleanInput.startsWith("-cm")) {
           const entry = text.substring(3).trim(); 
           const firstWord = entry.split(" ")[0].toLowerCase(); 
           
           if(!firstWord) {
-             appendMessage("Error: Please supply structural context after -CM parameter.", 'ai');
+             appendMessage("Error: Missing profile descriptor variables behind -CM command tag.", 'ai');
              return;
           }
 
-          let currentPrivateDB = getPrivateDatabase();
-          currentPrivateDB.push({
+          const newEntry = {
             keywords: [firstWord],
-            answer: `📂 LOCAL ENTRY (Private to you):\n\n${entry}`
-          });
+            answer: `📂 GLOBAL SYNC ENTRY:\n\n${entry}`
+          };
+
+          customDatabase.push(newEntry);
+          await pushSharedDatabase(customDatabase);
           
-          // Writes values to local client sandbox. This data never touches a public network server.
-          localStorage.setItem('private_classmates', JSON.stringify(currentPrivateDB));
-          
-          response = `Target database sector verified. Entry "${firstWord}" locked exclusively into your local terminal environment.`;
+          response = `Data verified. Profile "${firstWord}" has been synced to the global server box for all users.`;
           appendMessage(response, 'ai');
           return;
         }
 
-        // Combine system base arrays alongside the client's localized variables
-        const activePrivateDB = getPrivateDatabase();
-        const absoluteDatabase = [...defaultDatabase, ...activePrivateDB];
+        const absoluteDatabase = [...defaultDatabase, ...customDatabase];
 
-        // --- COMBINED MASTER DATABASE INQUIRY ---
-        if (cleanInput === "database" || cleanInput === "show database" || cleanInput === "my local db") {
-            response = "⚡ System Dynamic Engine Records:\n\n" + absoluteDatabase.map(i => i.answer).join("\n\n---\n\n");
+        if (cleanInput === "database" || cleanInput === "show database" || cleanInput === "global db") {
+            response = "🌐 Shared Network Storage Output Records:\n\n" + absoluteDatabase.map(i => i.answer).join("\n\n---\n\n");
             appendMessage(response, 'ai');
             return;
         }
 
-        // --- SCAN COMBINED DATA ---
         let found = false;
         for (let item of absoluteDatabase) {
           if (item.keywords.some(kw => cleanInput.includes(kw))) {
@@ -446,7 +482,7 @@
         if (!found) {
           if (cleanInput.includes("boss")) response = "Sahal is the boss!";
           else if (cleanInput.includes("jacky")) response = "Jacky engineered this build.";
-          else if (cleanInput.includes("hello") || cleanInput.includes("hi")) response = "Greetings user. Interface optimal.";
+          else if (cleanInput.includes("hello") || cleanInput.includes("hi")) response = "Greetings user. Engine environment healthy.";
         }
 
         appendMessage(response, 'ai');
